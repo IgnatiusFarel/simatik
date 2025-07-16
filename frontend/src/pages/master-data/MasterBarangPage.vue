@@ -1,10 +1,8 @@
 <script setup>
 import { useHead } from "@vueuse/head";
-import DashboardLayout from "../../components/layout/DashboardLayout.vue";
-import DashboardView from "../../components/dashboard/DashboardView.vue";
 
 useHead({
-  title: "Halaman Dashboard - SIMATIK",
+  title: "Halaman Master Barang - SIMATIK",
   meta: [
     {
       name: "description",
@@ -14,8 +12,6 @@ useHead({
 });
 </script>
 
-<template>
-  <DashboardLayout>
-    <DashboardView />
-  </DashboardLayout>
+<template>  
+    <h1> Ini Master Barang Page </h1>  
 </template>
