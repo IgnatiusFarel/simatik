@@ -1,45 +1,42 @@
 <template>
-  <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 mb-4">
-    <AssetCard
-      total="1.234"
-      title="Semua Aset"
-      subTitle="Aset TIK"
-      subtitleDesc="Semua Aset"
-      percentage="100%"
-      :isCollapsed="isSidebarCollapsed"
-    />
-    <AssetCard
-      total="534"
-      title="Aset Digunakan"
-      subTitle="Aset TIK"
-      subtitleDesc="Digunakan"
-      percentage="43%"
-      :isCollapsed="isSidebarCollapsed"
-    />
-    <AssetCard
-      total="700"
-      title="Aset Cadangan"
-      subTitle="Aset TIK"
-      subtitleDesc="Cadangan"
-      percentage="57%"
-      :isCollapsed="isSidebarCollapsed"
-    />
-  </div>
   <CustomTable :columns="columns" :data="data">
+    <template #header-filter>
+      <a-input
+        v-model="search"
+        type="text"
+        placeholder="Search..."
+        class="rounded-[8px] pl-3 pr-3 py-1 text-sm w-60 border-[#9E9E9E]"
+        allow-clear
+      >
+        <template #prefix>
+          <Search class="w-4 h-4 text-[#9e9e9e]" />
+        </template>
+      </a-input>
+    </template>
     <template #header-action>
-      <span class="text-sm">Recent History</span>
+      <a-button
+        class="flex items-center gap-2 bg-[#d30007] text-white px-3 py-1 rounded-[8px] font-semibold"  @click="openAddBarang"
+      >
+        <Plus class="w-4 h-4" /> Add Barang</a-button
+      >
+      <AddBarang ref="addBarangRef" />
     </template>
   </CustomTable>
 </template>
 
 <script setup>
-import AssetCard from "./AssetCard.vue";
 import CustomTable from "../CustomTable.vue";
-import { h } from "vue";
-import { SquarePen, Trash2 } from "lucide-vue-next";
+import AddBarang from "./AddBarang.vue";
+import { h, ref} from "vue";
+import { SquarePen, Search, Trash2, Plus, } from "lucide-vue-next";
 import { Tag } from "ant-design-vue";
 
-const isSidebarCollapsed = false;
+const addBarangRef = ref(null);
+
+
+const openAddBarang = () => {
+  addBarangRef.value?.open(); // memanggil method open() dari AddBarang
+};
 
 const data = [
   {

@@ -1,5 +1,6 @@
 <script setup>
 import { useHead } from '@vueuse/head';
+import ReportBarangView from '@/components/report-barang/ReportBarangView.vue';
 
 useHead({
   title: 'Halaman Report Barang - SIMATIK',
@@ -14,5 +15,5 @@ useHead({
 </script>
 
 <template>    
-  <h1> Ini adalah report barang</h1>  
+  <ReportBarangView />
 </template>

@@ -8,7 +8,7 @@
         ? 'h-screen w-[72px] px-2 py-4'
         : 'h-screen w-[280px] px-6 py-6',
     ]"
-  >    
+  >
     <div class="flex items-center justify-between mb-6">
       <div class="flex justify-center w-full" v-if="!isMobile">
         <img
@@ -30,8 +30,8 @@
         </button>
       </div>
     </div>
-    
-    <div class="space-y-6 text-sm">    
+
+    <div class="space-y-6 text-sm">
       <div>
         <h2
           v-if="!collapsed || isMobile"
@@ -40,16 +40,19 @@
           MAIN MENU
         </h2>
         <router-link
-  to="/dashboard"
-  class="rounded-md text-red-600 bg-red-50 cursor-pointer transition-colors"
-  :class="collapsed && !isMobile
-    ? 'flex items-center justify-center w-full h-10'
-    : 'flex items-center space-x-2 px-3 py-2'"
->
-  <LayoutGrid class="w-4 h-4" />
-  <span v-if="!collapsed || isMobile">Dashboard</span>
-</router-link>
-
+          to="/dashboard"          
+          :class="[
+            'rounded-md cursor-pointer hover:text-red-600 transition-colors',
+            { 
+              'text-red-600 bg-red-50': $route.path === '/dashboard', 
+              'flex items-center space-x-2 px-3 py-2': !(collapsed && !isMobile),
+              'flex items-center justify-center w-full h-10': collapsed && !isMobile 
+            }
+          ]"
+        >
+          <LayoutGrid class="w-4 h-4" />
+          <span v-if="!collapsed || isMobile">Dashboard</span>
+        </router-link>
       </div>
 
       <div>
@@ -62,12 +65,14 @@
         <div :class="!collapsed || isMobile ? 'pl-4 space-y-4' : 'space-y-4'">
           <router-link
             to="/master-barang"
-            class="flex items-center hover:text-red-600 transition-colors"
-            :class="
-              collapsed && !isMobile
-                ? 'justify-center w-full h-10'
-                : 'space-x-2'
-            "
+             :class="[
+            'rounded-md cursor-pointer hover:text-red-600 transition-colors',
+            { 
+              'text-red-600 bg-red-50': $route.path === '/master-barang', 
+              'flex items-center space-x-2 px-3 py-2': !(collapsed && !isMobile),
+              'flex items-center justify-center w-full h-10': collapsed && !isMobile 
+            }
+          ]"
           >
             <Box class="w-4 h-4" />
             <span v-if="!collapsed || isMobile">Master Barang</span>
@@ -75,20 +80,21 @@
 
           <router-link
             to="/master-user"
-            class="flex items-center hover:text-red-600 transition-colors"
-            :class="
-              collapsed && !isMobile
-                ? 'justify-center w-full h-10'
-                : 'space-x-2'
-            "
+           :class="[
+            'rounded-md cursor-pointer hover:text-red-600 transition-colors',
+            { 
+              'text-red-600 bg-red-50': $route.path === '/master-user', 
+              'flex items-center space-x-2 px-3 py-2': !(collapsed && !isMobile),
+              'flex items-center justify-center w-full h-10': collapsed && !isMobile 
+            }
+          ]"
           >
             <User class="w-4 h-4" />
             <span v-if="!collapsed || isMobile">Master User</span>
           </router-link>
         </div>
       </div>
-
-      <!-- REPORTING -->
+      
       <div>
         <h2
           v-if="!collapsed || isMobile"
@@ -96,17 +102,20 @@
         >
           REPORTING
         </h2>
-      <router-link
-  to="/report-barang"
-  class="cursor-pointer hover:text-red-600 transition-colors"
-  :class="collapsed && !isMobile
-    ? 'flex items-center justify-center w-full h-10'
-    : 'flex items-center space-x-2 pl-4'"
->
-  <ClipboardPlus class="w-4 h-4" />
-  <span v-if="!collapsed || isMobile">Report Barang</span>
-</router-link>
-
+        <router-link
+          to="/report-barang"
+          :class="[
+            'rounded-md cursor-pointer hover:text-red-600 transition-colors',
+            { 
+              'text-red-600 bg-red-50': $route.path === '/report-barang', 
+              'flex items-center space-x-2 px-3 py-2': !(collapsed && !isMobile),
+              'flex items-center justify-center w-full h-10': collapsed && !isMobile 
+            }
+          ]"
+        >
+          <ClipboardPlus class="w-4 h-4" />
+          <span v-if="!collapsed || isMobile">Report Barang</span>
+        </router-link>
       </div>
     </div>
   </main>

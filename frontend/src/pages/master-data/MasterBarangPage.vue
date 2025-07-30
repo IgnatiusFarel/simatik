@@ -1,5 +1,6 @@
 <script setup>
 import { useHead } from "@vueuse/head";
+import MasterBarangView from "../../components/master-barang/MasterBarangView.vue";
 
 useHead({
   title: "Halaman Master Barang - SIMATIK",
@@ -13,5 +14,5 @@ useHead({
 </script>
 
 <template>  
-    <h1> Ini Master Barang Page </h1>  
+    <MasterBarangView />
 </template>
