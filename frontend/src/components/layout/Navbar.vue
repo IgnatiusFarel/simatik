@@ -45,7 +45,7 @@
 
 <script setup>
 import { ref } from 'vue'
-import { Menu, Bell, ChevronRight, Search  } from 'lucide-vue-next' // import icon dari lucide
+import { Menu, Bell, ChevronRight, Search  } from 'lucide-vue-next' 
 
 const searchText = ref('')
 </script>
