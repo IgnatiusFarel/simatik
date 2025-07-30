@@ -1,5 +1,6 @@
 <script setup>
 import { useHead } from '@vueuse/head';
+import MasterUserView from '../../components/master-user/MasterUserView.vue';
 
 useHead({
   title: 'Halaman Master User - SIMATIK',
@@ -14,5 +15,5 @@ useHead({
 </script>
 
 <template>    
-  <h1> Ini adalah master user wak</h1>  
+  <MasterUserView />
 </template>
