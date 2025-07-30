@@ -5,7 +5,7 @@
       title="Semua Aset"
       subTitle="Aset TIK"
       subtitleDesc="Semua Aset"
-      percentage="100%"    
+      percentage="100%"
       :isCollapsed="isSidebarCollapsed"
     />
     <AssetCard
@@ -13,7 +13,7 @@
       title="Aset Digunakan"
       subTitle="Aset TIK"
       subtitleDesc="Digunakan"
-      percentage="43%"      
+      percentage="43%"
       :isCollapsed="isSidebarCollapsed"
     />
     <AssetCard
@@ -21,20 +21,25 @@
       title="Aset Cadangan"
       subTitle="Aset TIK"
       subtitleDesc="Cadangan"
-      percentage="57%"      
+      percentage="57%"
       :isCollapsed="isSidebarCollapsed"
     />
   </div>
-  <CustomTable :columns="columns" :data="data"  />
+  <CustomTable :columns="columns" :data="data">
+    <template #header-action>
+      <span class="text-sm">Recent History</span>
+    </template>
+  </CustomTable>
 </template>
 
 <script setup>
-import AssetCard from './AssetCard.vue'
-import CustomTable from '../CustomTable.vue'
-import { h } from "vue"
-import { SquarePen, Trash2 } from "lucide-vue-next"
+import AssetCard from "./AssetCard.vue";
+import CustomTable from "../CustomTable.vue";
+import { h } from "vue";
+import { SquarePen, Trash2 } from "lucide-vue-next";
+import { Tag } from "ant-design-vue";
 
-const isSidebarCollapsed = false
+const isSidebarCollapsed = false;
 
 const data = [
   {
@@ -67,8 +72,7 @@ const data = [
     kategori: "Komputer",
     status: "Baik",
   },
-  // Tambahkan data lainnya...
-]
+];
 
 const columns = [
   { title: "No. Seri", dataIndex: "seri" },
@@ -77,7 +81,12 @@ const columns = [
   { title: "Pemeliharaan", dataIndex: "pemeliharaan" },
   { title: "Harga Barang", dataIndex: "harga_barang" },
   { title: "Kategori", dataIndex: "kategori" },
-  { title: "Status", dataIndex: "status" },
+  {
+    title: "Status",
+    dataIndex: "status",
+    customRender: ({ record }) =>
+      h(Tag, { color: getStatusTagColor(record.status) }, () => record.status),
+  },
   {
     title: "Action",
     key: "action",
@@ -101,10 +110,20 @@ const columns = [
         ),
       ]),
   },
-]
+];
+
+const getStatusTagColor = (status) => {
+  switch (status) {
+    case "Baik":
+      return "green";
+    case "Pemeliharaan":
+      return "orange";
+    case "Rusak":
+      return "red";
+    default:
+      return "default";
+  }
+};
 </script>
 
-
-<style>
-
-</style>
+<style></style>
