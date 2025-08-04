@@ -5,7 +5,7 @@
         v-model="search"
         type="text"
         placeholder="Search..."
-        class="rounded-[8px] pl-3 pr-3 py-1 text-sm w-60 border-[#9E9E9E]"
+        class="rounded-[8px] pl-3 pr-3 py-1 text-sm w-60 h-[34px] border-[#9E9E9E]"
         allow-clear
       >
         <template #prefix>
@@ -15,28 +15,34 @@
     </template>
     <template #header-action>
       <a-button
-        class="flex items-center gap-2 bg-[#d30007] text-white px-3 py-1 rounded-[8px] font-semibold"  @click="openAddBarang"
+      type="primary"
+      class="flex items-center gap-2 text-white px-3 py-1 rounded-[8px] font-semibold"  @click="openAddBarang"
       >
         <Plus class="w-4 h-4" /> Add Barang</a-button
-      >
-      <AddBarang ref="addBarangRef" />
+      >      
     </template>
   </CustomTable>
+  <AddBarang  ref="addBarangRef"/>
+  <EditBarang ref="editBarangRef" />
 </template>
 
 <script setup>
-import CustomTable from "../CustomTable.vue";
-import AddBarang from "./AddBarang.vue";
 import { h, ref} from "vue";
-import { SquarePen, Search, Trash2, Plus, } from "lucide-vue-next";
 import { Tag } from "ant-design-vue";
+import AddBarang from "./AddBarang.vue";
+import CustomTable from "../CustomTable.vue";
+import { SquarePen, Search, Trash2, Plus, } from "lucide-vue-next";
 
-const addBarangRef = ref(null);
-
+const addBarangRef = ref(null); 
+const editBarangRef = ref(null);
 
 const openAddBarang = () => {
-  addBarangRef.value?.open(); // memanggil method open() dari AddBarang
-};
+  addBarangRef.value.openModal(); 
+}; 
+
+const openEditBarang = () => {
+  editBarangRef.value.openModal(); 
+}
 
 const data = [
   {
@@ -93,7 +99,7 @@ const columns = [
           "button",
           {
             class: "text-blue-500 hover:text-blue-700",
-            onClick: () => console.log("Edit", record),
+            onClick: () => openEditBarang(record),
           },
           [h(SquarePen, { size: 18 })]
         ),
