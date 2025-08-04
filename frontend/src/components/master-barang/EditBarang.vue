@@ -7,7 +7,7 @@
     class="max-w-md"
   >
     <template #title>
-      <h2 class="text-center w-full text-lg font-semibold">Tambah Barang</h2>
+      <h2 class="text-center w-full text-lg font-semibold">Edit Barang</h2>
     </template>
     <a-form layout="vertical" ref="formRef" hideRequiredMark>
       <a-form-item label="Nomor Seri Barang" :rules="rules.seri">
@@ -21,14 +21,13 @@
             action="https://www.mocky.io/v2/5cc8019d300000980a055e76"
             list-type="picture-card"
             @preview="handlePreview"
-            :max-count="1"
           >
-            <template v-if="fileList.length === 0">
-            <div class="flex flex-col items-center justify-center">
+            <!-- <div v-if="fileList.length < 8"> -->
+            <div class="flex-col">
               <Plus />
               <p>Upload</p>
             </div>
-            </template>
+            <!-- </div> -->
           </a-upload>
           <a-modal
             :open="previewVisible"
@@ -36,7 +35,7 @@
             :footer="null"
             @cancel="handleExitPreview"
           >
-            <img alt="Gambar Barang" style="width: 100%" :src="previewImage" />
+            <img alt="example" style="width: 100%" :src="previewImage" />
           </a-modal>
         </div>
       </a-form-item>
@@ -47,10 +46,16 @@
         />
       </a-form-item>
       <a-form-item label="Tahun Pengadaan Barang" :rules="rules.pengadaan">
-        <a-date-picker v-model:value="form.pengadaan" :format="dateFormat" class="w-full" placeholder="Pilih Tahun Pengadaan Barang" />
+        <a-input
+          v-model:value="form.pengadaan"
+          placeholder="Masukkan Tahun Pengadaan Barang"
+        />
       </a-form-item>
       <a-form-item label="Tahun Pemeliharaan Barang" :rules="rules.pemeliharaan">
-        <a-date-picker v-model:value="form.pemeliharaan" :format="dateFormat" class="w-full" placeholder="Pilih Tahun Pemeliharaan Barang" />
+        <a-input
+          v-model:value="form.pemeliharaan"
+          placeholder="Masukkan Tahun Pemeliharaan Barang"
+        />
       </a-form-item>
       <a-form-item label="Harga Barang" :rules="rules.harga">
         <a-input
@@ -88,8 +93,6 @@ import { Plus } from "lucide-vue-next";
 const isOpen = ref(false);
 const formRef = ref(null);
 const loading = ref(false);
-const fileList = ref([]);
-const dateFormat = 'DD/MM/YYYY';
 
 const rules = {
   seri: [{ required: true, message: "Nomor seri wajib diisi!" }],
@@ -162,12 +165,4 @@ defineExpose({
 });
 </script>
 
-<style scoped>
-:deep(.ant-upload.ant-upload-select-picture-card) {
-  width: 100% !important;  
-}
-
-:deep(.ant-upload-list-picture-card-container) {
-  width: 100% !important;
-}
-</style>
+<style scoped></style>

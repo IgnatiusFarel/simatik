@@ -5,7 +5,7 @@
         v-model="search"
         type="text"
         placeholder="Search..."
-        class="rounded-[8px] pl-3 pr-3 py-1 text-sm w-60 border-[#9E9E9E]"
+        class="rounded-[8px] pl-3 pr-3 py-1 text-sm w-60 h-[34px] border-[#9E9E9E]"
         allow-clear
       >
         <template #prefix>
@@ -15,19 +15,34 @@
     </template>
     <template #header-action>
       <a-button
-        class="flex items-center gap-2 bg-[#d30007] text-white px-3 py-1 rounded-[8px] font-semibold"
+        class="flex items-center gap-2 bg-[#d30007] text-white px-3 py-1 rounded-[8px] font-semibold" @click="openAddUser"
       >
         <Plus class="w-4 h-4" /> Add User</a-button
       >
     </template>
   </CustomTable>
+  <AddUser ref="addUserRef" />
+  <EditUser ref="editUserRef" />
 </template>
 
 <script setup>
-import CustomTable from "../CustomTable.vue";
-import { h } from "vue";
-import { SquarePen, Trash2, Plus, Search } from "lucide-vue-next";
+import { h, ref } from "vue";
 import { Tag } from "ant-design-vue";
+import AddUser from "./AddUser.vue";
+import CustomTable from "../CustomTable.vue";
+import { SquarePen, Trash2, Plus, Search } from "lucide-vue-next";
+import EditUser from "./EditUser.vue";
+
+const addUserRef = ref(null); 
+const editUserRef = ref(null); 
+
+const openAddUser = () => {
+  addUserRef.value.openModal();
+}
+
+const openEditUser = () => {
+  editUserRef.value.openModal();
+}
 
 const data = [
   {
@@ -234,7 +249,7 @@ const columns = [
           "button",
           {
             class: "text-blue-500 hover:text-blue-700",
-            onClick: () => console.log("Edit", record),
+            onClick: () => openEditUser(record),
           },
           [h(SquarePen, { size: 18 })]
         ),

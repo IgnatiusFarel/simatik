@@ -30,16 +30,23 @@
       <span class="text-sm">Recent History</span>
     </template>
   </CustomTable>
+  <EditBarang ref="editBarangRef" />
 </template>
 
 <script setup>
-import AssetCard from "./AssetCard.vue";
-import CustomTable from "../CustomTable.vue";
-import { h } from "vue";
-import { SquarePen, Trash2 } from "lucide-vue-next";
+import { h, ref } from "vue";
 import { Tag } from "ant-design-vue";
+import AssetCard from "./AssetCard.vue";
+import EditBarang from "./EditBarang.vue";
+import CustomTable from "../CustomTable.vue";
+import { SquarePen, Trash2 } from "lucide-vue-next";
 
 const isSidebarCollapsed = false;
+const editBarangRef = ref(false)
+
+const openEditBarang = () => {
+  editBarangRef.value.openModal(); 
+}
 
 const data = [
   {
@@ -96,7 +103,7 @@ const columns = [
           "button",
           {
             class: "text-blue-500 hover:text-blue-700",
-            onClick: () => console.log("Edit", record),
+            onClick: () => openEditBarang(record),
           },
           [h(SquarePen, { size: 18 })]
         ),

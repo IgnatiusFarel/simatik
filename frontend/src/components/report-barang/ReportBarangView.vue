@@ -1,7 +1,7 @@
 <template>
    <CustomTable :columns="columns" :data="data">
     <template #header-filter>
-      <a-range-picker v-model:value="value1" />
+      <a-range-picker v-model:value="value1" class="h-[34px]" />
     </template>
     <template #header-action>
       <a-button
@@ -15,8 +15,10 @@
 </template>
 
 <script setup>
-import CustomTable from '../CustomTable.vue';
+import { h, ref } from "vue";
+import { Tag } from "ant-design-vue";
 import { Plus } from "lucide-vue-next";
+import CustomTable from '../CustomTable.vue';
 
 const data = [
   {
@@ -58,8 +60,26 @@ const columns = [
   { title: "Pemeliharaan", dataIndex: "pemeliharaan" },
   { title: "Harga Barang", dataIndex: "harga_barang" },
   { title: "Kategori", dataIndex: "kategori" },
-  { title: "Status", dataIndex: "status" },  
+    {
+    title: "Status",
+    dataIndex: "status",
+    customRender: ({ record }) =>
+      h(Tag, { color: getStatusTagColor(record.status) }, () => record.status),
+  },
 ]
+
+const getStatusTagColor = (status) => {
+  switch (status) {
+    case "Baik":
+      return "green";
+    case "Pemeliharaan":
+      return "orange";
+    case "Rusak":
+      return "red";
+    default:
+      return "default";
+  }
+};
 </script>
 
 <style>
