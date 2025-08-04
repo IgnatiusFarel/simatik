@@ -12,8 +12,7 @@ use Illuminate\Support\Facades\Mail;
 use Illuminate\Validation\ValidationException;
 
 class AuthController extends Controller
-{
-    // ==================== LOGIN ====================
+{    
     public function login(Request $request)
     {
         $credentials = $request->validate([
@@ -23,16 +22,15 @@ class AuthController extends Controller
         ]);
 
         $user = User::where('username', $credentials['login'])
-    ->orWhere('email', $credentials['login'])
-    ->first();
+            ->orWhere('email', $credentials['login'])
+            ->first();
 
         if (!$user || !Hash::check($credentials['password'], $user->password)) {
             throw ValidationException::withMessages([
                 'username' => ['Username atau password salah.'],
             ]);
         }
-
-        // ROLE WAJIB SUPERADMIN
+        
         if (strtolower(str_replace(' ', '', $user->role)) !== 'superadmin') {
             return response()->json([
                 'status' => false,
@@ -41,7 +39,7 @@ class AuthController extends Controller
         }
 
         $tokenName = 'auth_token';
-        $expire = $request->boolean('remember') ? now()->addDays(3) : now()->addHours(2);
+        $expire = $request->boolean('remember') ? now()->addDays(3) : now()->addDay();
         $token = $user->createToken($tokenName, ['*'], $expire)->plainTextToken;
 
         return response()->json([
@@ -54,8 +52,7 @@ class AuthController extends Controller
             ]
         ], 200);
     }
-
-    // ==================== LOGOUT ====================
+    
     public function logout(Request $request)
     {
         $request->user()->currentAccessToken()->delete();
@@ -66,7 +63,6 @@ class AuthController extends Controller
         ], 200);
     }
 
-    // ==================== FORGOT PASSWORD ====================
     public function forgotPassword(Request $request)
     {
         $request->validate(['email' => 'required|email']);
@@ -85,8 +81,7 @@ class AuthController extends Controller
             'message' => 'Email tidak ditemukan'
         ], 404);
     }
-
-    // ==================== RESET PASSWORD ====================
+    
     public function resetPassword(Request $request)
     {
         $request->validate([
