@@ -4,7 +4,7 @@
       <div class="flex items-center gap-4 flex-wrap">
         <div class="flex items-center gap-2">
           <label class="text-sm font-medium">Show</label>
-          <a-select v-model:value="pageSize" :options="pageSizeOptions" />
+          <a-select v-model:value="pageSize" :options="pageSizeOptions"  class="page-size-select" />
           <span class="text-sm">entries</span>
         </div>
         <slot name="header-filter"></slot>
@@ -26,7 +26,7 @@
         :page-size="pageSize"
         :total="filteredData.length"
         @change="onPageChange"
-        :itemRender="customItemRender"
+        :itemRender="customItemRender"        
       />
     </div>
   </div>
@@ -34,7 +34,6 @@
 
 <script setup>
 import { h, ref, computed, watch } from "vue";
-import { Search } from "lucide-vue-next";
 
 const props = defineProps({
   data: { type: Array, required: true },
@@ -111,5 +110,11 @@ const customItemRender = ({ type, originalElement, page }) => {
   border-radius: 8px !important;
   background-color: #e0e0e0 !important;
   border: none !important;
+}
+
+:deep(.page-size-select .ant-select-selector) {
+  height: 34px !important;
+  display: flex;
+  align-items: center;
 }
 </style>
