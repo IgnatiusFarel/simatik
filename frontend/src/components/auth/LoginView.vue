@@ -1,100 +1,116 @@
 <template>
   <main class="flex h-screen">
-    <!-- Sisi kiri -->
-    <div class="w-1/2 bg-black"></div>
-
-    <!-- Sisi kanan -->
-    <div class="w-1/2 flex items-center justify-center">
+    <div class="hidden lg:block w-1/2 bg-black"></div>
+    <div class="w-full lg:w-1/2 flex items-center justify-center">
       <div class="w-full max-w-[480px] px-4 space-y-4">
-        <!-- Logo -->
         <div class="flex justify-center">
           <img src="@/assets/Logo.png" alt="logo" class="w-48" />
         </div>
 
-        <!-- Form -->
-        <a-form layout="vertical" ref="formRef" :model="formData" :rules="rules" class="w-full">
-          <a-form-item label="Email" name="email">
+        <a-form
+          layout="vertical"
+          ref="formRef"
+          :model="formData"
+          :rules="rules"
+          class="w-full"
+          hideRequiredMark
+            @finish="handleLogin"
+        >
+          <a-form-item label="Email/Username" name="login">
             <a-input
-              v-model:value="formData.email"
-              placeholder="Input your email account"
-              class="w-full h-[56px] border border-[#E9EAEC] rounded-[8px]"
+              v-model:value="formData.login"
+              placeholder="Masukkan Email/Username Anda"
+              class="w-full border border-[#E9EAEC] rounded-[8px]"
             />
           </a-form-item>
 
           <a-form-item label="Password" name="password">
             <a-input-password
               v-model:value="formData.password"
-              placeholder="Input your password account"
-              class="w-full h-[56px] border border-[#E9EAEC] rounded-[8px]"
+              placeholder="Masukkan Password Anda"
+              class="w-full border border-[#E9EAEC] rounded-[8px]"
             />
           </a-form-item>
 
-          <!-- Remember & Forgot -->
           <div class="flex justify-between items-center mb-4">
             <a-checkbox v-model:checked="formData.remember">
-              <span class="text-sm text-[#657081] font-medium">Remember Me</span>
+              <span class="text-sm text-[#657081] font-medium"
+                >Remember Me</span
+              >
             </a-checkbox>
-            <a class="text-sm text-[#657081] font-medium hover:underline hover:text-blue-500 cursor-pointer">
+            <a
+              class="text-sm text-[#657081] font-medium hover:underline hover:text-blue-500 cursor-pointer"
+            >
               Forgot Password
             </a>
           </div>
 
-          <!-- Button -->
           <a-button
             type="primary"
             html-type="submit"
             block
-            class="bg-red-600 hover:bg-red-700 border-none w-full h-[56px] rounded-xl"
-            @click="onSubmit"
+            :loading="loading"
+            :disabled="loading"
+            class="transition-transform transform active:scale-95 border-none w-full rounded-xl h-[46px] font-semibold"            
           >
-            Login
+            <span v-if="loading">Memproses...</span>
+            <span v-else>Login</span>
           </a-button>
         </a-form>
 
-        <!-- Footer -->
-        <p class="text-xs text-gray-400 text-center mt-4">
-          Design Inspired by @
-        </p>
+        <a
+          href="https://www.figma.com/community/file/1426385374644644649/sistem-informasi-manajemen-aset-tik"
+          target="_blank"
+          rel="noopener noreferrer"
+          class="block text-xs text-gray-400 text-center mt-4 hover:underline hover:text-blue-500 cursor-pointer"
+        >
+          Design by Dinkz Nasaruddin
+        </a>
       </div>
     </div>
   </main>
 </template>
 
-
 <script setup>
-import { ref, reactive, toRaw } from 'vue'
+import { useAuthStore } from "@/stores/auth";
+import { ref, reactive, toRaw } from "vue";
+import { message } from "ant-design-vue";
+import router from "@/router";
 
-const formRef = ref()
+const auth = useAuthStore();
+const formRef = ref();
+const loading = ref(false);
 
 const formData = reactive({
-  email: '',
-  password: '',
-  remember: false
-})
+  login: "",
+  password: "",
+  remember: false,
+});
 
 const rules = {
-  email: [
-    {  message: 'Input your email account!' },
-    { type: 'email', message: 'Please input a valid email!' } // Menambahkan validasi email
+  login: [
+    { required: true, message: "Email atau Username wajib diisi" },
+    // { type: "email", message: "Format email tidak valid" },
   ],
   password: [
-    {  message: 'Input your password account!' },
-    { min: 6, message: 'Password must be at least 6 characters!' } // Menambahkan validasi panjang password
-  ]
-}
+    { required: true, message: "Password wajib diisi" },
+    { min: 8, message: "Password minimal 8 karakter" },
+  ],
+};
+const handleLogin = async () => {
+  try {
+    loading.value = true;
+    await auth.login(toRaw(formData));
+    message.success("Login Berhasil!");
+    router.push("/dashboard");
+  } catch (error) {
+    console.error("Error login:", error);
+    message.error(error?.message || "Login Gagal!");
+  } finally {
+    loading.value = false;
+  }
+};
 
 
-const onSubmit = () => {
-  formRef.value
-    .validate()
-    .then(() => {
-      console.log('VALID:', toRaw(formData))
-    })
-    .catch((error) => {
-      console.log('Validation Failed:', error)
-    })
-}
+
 </script>
-
-
-
