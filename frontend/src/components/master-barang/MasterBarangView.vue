@@ -1,5 +1,5 @@
 <template>
-  <CustomTable :columns="columns" :data="data">
+  <CustomTable :columns="columns" :data="dataTable">
     <template #header-filter>
       <a-input
         v-model="search"
@@ -27,14 +27,17 @@
 </template>
 
 <script setup>
-import { h, ref} from "vue";
+import { h, ref, onMounted} from "vue";
 import { Tag } from "ant-design-vue";
 import AddBarang from "./AddBarang.vue";
 import CustomTable from "../CustomTable.vue";
 import { SquarePen, Search, Trash2, Plus, } from "lucide-vue-next";
+import Api from "@/services/Api.js"
 
 const addBarangRef = ref(null); 
 const editBarangRef = ref(null);
+const dataTable = ref([]);
+const loading = ref(false);
 
 const openAddBarang = () => {
   addBarangRef.value.openModal(); 
@@ -44,45 +47,12 @@ const openEditBarang = () => {
   editBarangRef.value.openModal(); 
 }
 
-const data = [
-  {
-    key: "1",
-    seri: "#20462",
-    barang: "Hat",
-    tahun_pengadaan: 2014,
-    pemeliharaan: "13/05/2022",
-    harga_barang: "Rp.13.000.00",
-    kategori: "Komputer",
-    status: "Baik",
-  },
-  {
-    key: "1",
-    seri: "#20462",
-    barang: "Hat",
-    tahun_pengadaan: 2014,
-    pemeliharaan: "13/05/2022",
-    harga_barang: "Rp.13.000.00",
-    kategori: "Komputer",
-    status: "Baik",
-  },
-  {
-    key: "1",
-    seri: "#20462",
-    barang: "Hat",
-    tahun_pengadaan: 2014,
-    pemeliharaan: "13/05/2022",
-    harga_barang: "Rp.13.000.00",
-    kategori: "Komputer",
-    status: "Baik",
-  },
-];
-
 const columns = [
   { title: "No. Seri", dataIndex: "seri" },
   { title: "Barang", dataIndex: "barang" },
-  { title: "Tahun Pengadaan", dataIndex: "tahun_pengadaan" },
+  { title: "Tahun Pengadaan", dataIndex: "pengadaan" },
   { title: "Pemeliharaan", dataIndex: "pemeliharaan" },
-  { title: "Harga Barang", dataIndex: "harga_barang" },
+  { title: "Harga Barang", dataIndex: "harga" },
   { title: "Kategori", dataIndex: "kategori" },
   {
     title: "Status",
@@ -127,6 +97,22 @@ const getStatusTagColor = (status) => {
       return "default";
   }
 };
+
+const fetchData = async () => {
+  loading.value=true; 
+  try {
+    const response = await Api.get('/master-barang')
+    dataTable.value = response.data.data.data;   
+  } catch (error) {
+    message.error(error);
+  } finally{
+    loading.value=false;
+  }
+}
+
+onMounted(() => {
+  fetchData();
+})
 </script>
 
 <style></style>
