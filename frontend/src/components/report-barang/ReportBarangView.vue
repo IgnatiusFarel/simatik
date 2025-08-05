@@ -1,5 +1,5 @@
 <template>
-   <CustomTable :columns="columns" :data="data">
+   <CustomTable :columns="columns" :data="dataTable">
     <template #header-filter>
       <a-range-picker v-model:value="value1" class="h-[34px]" />
     </template>
@@ -15,50 +15,21 @@
 </template>
 
 <script setup>
-import { h, ref } from "vue";
+import { h, onMounted, ref } from "vue";
 import { Tag } from "ant-design-vue";
 import { Plus } from "lucide-vue-next";
 import CustomTable from '../CustomTable.vue';
+import Api from "@/services/Api.js"; 
 
-const data = [
-  {
-    key: "1",
-    seri: "#20462",
-    barang: "Hat",
-    tahun_pengadaan: 2014,
-    pemeliharaan: "13/05/2022",
-    harga_barang: "Rp.13.000.00",
-    kategori: "Komputer",
-    status: "Baik",
-  },
-  {
-    key: "1",
-    seri: "#20462",
-    barang: "Hat",
-    tahun_pengadaan: 2014,
-    pemeliharaan: "13/05/2022",
-    harga_barang: "Rp.13.000.00",
-    kategori: "Komputer",
-    status: "Baik",
-  },
-  {
-    key: "1",
-    seri: "#20462",
-    barang: "Hat",
-    tahun_pengadaan: 2014,
-    pemeliharaan: "13/05/2022",
-    harga_barang: "Rp.13.000.00",
-    kategori: "Komputer",
-    status: "Baik",
-  },  
-]
+const loading = ref(false); 
+const dataTable = ref([]);
 
 const columns = [
   { title: "No. Seri", dataIndex: "seri" },
   { title: "Barang", dataIndex: "barang" },
-  { title: "Tahun Pengadaan", dataIndex: "tahun_pengadaan" },
+  { title: "Tahun Pengadaan", dataIndex: "pengadaan" },
   { title: "Pemeliharaan", dataIndex: "pemeliharaan" },
-  { title: "Harga Barang", dataIndex: "harga_barang" },
+  { title: "Harga Barang", dataIndex: "harga" },
   { title: "Kategori", dataIndex: "kategori" },
     {
     title: "Status",
@@ -80,6 +51,22 @@ const getStatusTagColor = (status) => {
       return "default";
   }
 };
+
+const fetchData = async () => {
+  loading.value=true;
+  try {
+    const response = await Api.get('/master-barang');
+    dataTable.value= response.data.data.data; 
+  } catch (error) {
+    message.error(error)
+  } finally {
+    loading.value=false;
+  }
+}
+
+onMounted(() => {
+  fetchData();
+})
 </script>
 
 <style>
