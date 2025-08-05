@@ -1,14 +1,15 @@
 <template>
   <main
-    :class="[
-      'border-r border-[#E9EAEC] bg-white flex flex-col transition-all duration-300',
-      isMobile
-        ? 'h-full px-4 py-4'
-        : collapsed
-        ? 'h-screen w-[72px] px-2 py-4'
-        : 'h-screen w-[280px] px-6 py-6',
-    ]"
-  >
+  :class="[
+    'fixed top-0 left-0 h-screen border-r border-[#E9EAEC] bg-white flex flex-col transition-all duration-300 z-50',
+    isMobile
+      ? 'w-[280px] px-4 py-4'
+      : collapsed
+      ? 'w-[72px] px-2 py-4'
+      : 'w-[280px] px-6 py-6',
+  ]"
+>
+
     <div class="flex items-center justify-between mb-6">
       <div class="flex justify-center w-full" v-if="!isMobile">
         <img
