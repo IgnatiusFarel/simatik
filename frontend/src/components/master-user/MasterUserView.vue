@@ -1,5 +1,5 @@
 <template>
-  <CustomTable :columns="columns" :data="data">
+  <CustomTable :columns="columns" :data="dataTable" :search="search"  rowKey="master_user_id">
     <template #header-filter>
       <a-input
         v-model="search"
@@ -20,19 +20,22 @@
         <Plus class="w-4 h-4" /> Add User</a-button
       >
     </template>
-  </CustomTable>
+  </CustomTable>  
   <AddUser ref="addUserRef" />
   <EditUser ref="editUserRef" />
 </template>
 
 <script setup>
-import { h, ref } from "vue";
+import { h, ref, onMounted } from "vue";
 import { Tag } from "ant-design-vue";
 import AddUser from "./AddUser.vue";
 import CustomTable from "../CustomTable.vue";
 import { SquarePen, Trash2, Plus, Search } from "lucide-vue-next";
 import EditUser from "./EditUser.vue";
+import Api from "@/services/Api.js"
 
+const dataTable = ref([]); 
+const loading = ref(false)
 const addUserRef = ref(null); 
 const editUserRef = ref(null); 
 
@@ -44,205 +47,27 @@ const openEditUser = () => {
   editUserRef.value.openModal();
 }
 
-const data = [
-  {
-    id: 1,
-    nama: "John Doe",
-    username: "johndoe",
-    email: "johndoe@example.com",
-    skpd: "Dinas Pendidikan",
-    role: "Admin",
-    status: "Aktif",
-  },
-  {
-    id: 2,
-    nama: "Jane Smith",
-    username: "janesmith",
-    email: "janesmith@example.com",
-    skpd: "Dinas Kesehatan",
-    role: "User",
-    status: "Suspend",
-  },
-  {
-    id: 3,
-    nama: "Michael Johnson",
-    username: "michaelj",
-    email: "michaelj@example.com",
-    skpd: "Dinas Perhubungan",
-    role: "Admin",
-    status: "Aktif",
-  },
-  {
-    id: 4,
-    nama: "Emily Davis",
-    username: "emilydavis",
-    email: "emilydavis@example.com",
-    skpd: "Dinas Pekerjaan Umum",
-    role: "User",
-    status: "Aktif",
-  },
-  {
-    id: 5,
-    nama: "David Wilson",
-    username: "davidwilson",
-    email: "davidwilson@example.com",
-    skpd: "Dinas Sosial",
-    role: "Admin",
-    status: "Suspend",
-  },
-  {
-    id: 6,
-    nama: "Laura Martinez",
-    username: "lauramartinez",
-    email: "lauramartinez@example.com",
-    skpd: "Dinas Lingkungan Hidup",
-    role: "User",
-    status: "Aktif",
-  },
-  {
-    id: 7,
-    nama: "Robert Lee",
-    username: "robertlee",
-    email: "robertlee@example.com",
-    skpd: "Dinas Kebudayaan",
-    role: "Admin",
-    status: "Aktif",
-  },
-  {
-    id: 8,
-    nama: "Sophia Brown",
-    username: "sophiabrown",
-    email: "sophiabrown@example.com",
-    skpd: "Dinas Tenaga Kerja",
-    role: "User",
-    status: "Suspend",
-  },
-  {
-    id: 9,
-    nama: "William Garcia",
-    username: "williamgarcia",
-    email: "williamgarcia@example.com",
-    skpd: "Dinas Pariwisata",
-    role: "Admin",
-    status: "Aktif",
-  },
-  {
-    id: 10,
-    nama: "Olivia Harris",
-    username: "oliviaharris",
-    email: "oliviaharris@example.com",
-    skpd: "Dinas Perdagangan",
-    role: "User",
-    status: "Suspend",
-  },
-  {
-    id: 1,
-    nama: "John Doe",
-    username: "johndoe",
-    email: "johndoe@example.com",
-    skpd: "Dinas Pendidikan",
-    role: "Admin",
-    status: "Aktif",
-  },
-  {
-    id: 2,
-    nama: "Jane Smith",
-    username: "janesmith",
-    email: "janesmith@example.com",
-    skpd: "Dinas Kesehatan",
-    role: "User",
-    status: "Suspend",
-  },
-  {
-    id: 3,
-    nama: "Michael Johnson",
-    username: "michaelj",
-    email: "michaelj@example.com",
-    skpd: "Dinas Perhubungan",
-    role: "Admin",
-    status: "Aktif",
-  },
-  {
-    id: 4,
-    nama: "Emily Davis",
-    username: "emilydavis",
-    email: "emilydavis@example.com",
-    skpd: "Dinas Pekerjaan Umum",
-    role: "User",
-    status: "Aktif",
-  },
-  {
-    id: 5,
-    nama: "David Wilson",
-    username: "davidwilson",
-    email: "davidwilson@example.com",
-    skpd: "Dinas Sosial",
-    role: "Admin",
-    status: "Suspend",
-  },
-  {
-    id: 6,
-    nama: "Laura Martinez",
-    username: "lauramartinez",
-    email: "lauramartinez@example.com",
-    skpd: "Dinas Lingkungan Hidup",
-    role: "User",
-    status: "Aktif",
-  },
-  {
-    id: 7,
-    nama: "Robert Lee",
-    username: "robertlee",
-    email: "robertlee@example.com",
-    skpd: "Dinas Kebudayaan",
-    role: "Admin",
-    status: "Aktif",
-  },
-  {
-    id: 8,
-    nama: "Sophia Brown",
-    username: "sophiabrown",
-    email: "sophiabrown@example.com",
-    skpd: "Dinas Tenaga Kerja",
-    role: "User",
-    status: "Suspend",
-  },
-  {
-    id: 9,
-    nama: "William Garcia",
-    username: "williamgarcia",
-    email: "williamgarcia@example.com",
-    skpd: "Dinas Pariwisata",
-    role: "Admin",
-    status: "Aktif",
-  },
-  {
-    id: 10,
-    nama: "Olivia Harris",
-    username: "oliviaharris",
-    email: "oliviaharris@example.com",
-    skpd: "Dinas Perdagangan",
-    role: "User",
-    status: "Suspend",
-  },
-];
-
 const columns = [
-  { title: "Id", dataIndex: "id" },
-  { title: "Nama", dataIndex: "nama" },
-  { title: "Username", dataIndex: "username" },
-  { title: "email", dataIndex: "email" },
-  { title: "SKPD", dataIndex: "skpd" },
-  { title: "Role", dataIndex: "role" },
+  { title: "Id", dataIndex: ["user", "id"], width: 150 },
+  { title: "Nama", dataIndex: "nama", width: 200 },
+  { title: "Username", dataIndex: ["user", "username"], width: 180 },
+  { title: "Email", dataIndex: ["user", "email"], width: 250 },
+  { title: "SKPD", dataIndex: "skpd", width: 250 },
+  { title: "Role", dataIndex: ["user", "role"], width: 150 },
+  { title: "Email", dataIndex: ["user", "email"], width: 250 },
+  { title: "SKPD", dataIndex: "skpd", width: 250 },
+  { title: "Role", dataIndex: ["user", "role"], width: 150 },
   {
     title: "Status",
     dataIndex: "status",
+     width: 120,
     customRender: ({ record }) =>
       h(Tag, { color: getStatusTagColor(record.status) }, () => record.status),
   },
   {
     title: "Action",
     key: "action",
+     width: 120,
     customRender: ({ record }) =>
       h("div", { class: "flex space-x-2" }, [
         h(
@@ -277,6 +102,22 @@ const getStatusTagColor = (status) => {
       return "default";
   }
 };
+
+const fetchData = async () => {
+  loading.value =  true; 
+  try {
+    const response = await Api.get('/master-user');
+    dataTable.value = response.data.data.data;   
+  } catch (error) {
+    console.error(error);
+  } finally{
+    loading.value =  false;
+  }
+}
+
+onMounted(() => {
+  fetchData();
+})
 </script>
 
 <style></style>
