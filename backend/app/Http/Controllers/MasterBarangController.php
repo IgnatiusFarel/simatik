@@ -23,19 +23,19 @@ class MasterBarangController extends Controller
                 ->paginate($perPage);
 
             return response()->json([
-                'status'  => true,
+                'status' => true,
                 'message' => 'Data barang berhasil diambil!',
-                'data'    => $data,
+                'data' => $data,
             ], 200);
         } catch (\Throwable $th) {
             Log::error('Error fetching master barang data: ' . $th->getMessage());
             return response()->json([
-                'status'  => false,
+                'status' => false,
                 'message' => 'Data barang gagal diambil!'
             ], 500);
         }
     }
-    
+
     public function show($id)
     {
         try {
@@ -43,137 +43,150 @@ class MasterBarangController extends Controller
 
             if (!$barang) {
                 return response()->json([
-                    'status'  => false,
+                    'status' => false,
                     'message' => 'Data barang tidak ditemukan!'
                 ], 404);
             }
 
             return response()->json([
-                'status'  => true,
+                'status' => true,
                 'message' => 'Data barang berhasil diambil!',
-                'data'    => $barang
+                'data' => $barang
             ], 200);
         } catch (\Throwable $th) {
             Log::error('Error fetching master barang detail data: ' . $th->getMessage());
             return response()->json([
-                'status'  => false,
+                'status' => false,
                 'message' => 'Data barang gagal diambil!'
             ], 500);
         }
     }
-    
-     public function store(Request $request)
+
+    public function store(Request $request)
     {
         $validator = Validator::make($request->all(), [
-            'seri'         => 'required|string|unique:master_barang,seri',
-            'gambar'       => 'nullable|string',
-            'barang'       => 'required|string',
-            'pengadaan'    => 'required|date',
+            'seri' => 'required|string|unique:master_barang,seri',
+            'gambar' => 'required|image|mimes:jpeg,jpg,png|max:5120',
+            'barang' => 'required|string',
+            'pengadaan' => 'required|date',
             'pemeliharaan' => 'nullable|date',
-            'harga'        => 'required|numeric|min:0',
-            'kategori'     => 'required|string',
-            'status'       => 'required|in:Baik,Pemeliharaan,Rusak',
+            'harga' => 'required|numeric|min:0',
+            'kategori' => 'required|string',
+            'status' => 'required|in:Baik,Pemeliharaan,Rusak',
         ]);
 
         if ($validator->fails()) {
             return response()->json([
-                'status'  => false,
+                'status' => false,
                 'message' => 'Data barang tidak valid!',
-                'errors'  => $validator->errors()
+                'errors' => $validator->errors()
             ], 422);
         }
 
         DB::beginTransaction();
         try {
+            if ($request->hasFile('gambar')) {
+                $path = $request->file('gambar')->store('barang', 'public');
+            } else {
+                $path = null;
+            }
+
             $barang = MasterBarang::create([
-                'seri'         => $request->seri,
-                'gambar'       => $request->gambar,
-                'barang'       => $request->barang,
-                'pengadaan'    => $request->pengadaan,
+                'seri' => $request->seri,
+                'gambar' => $path,
+                'barang' => $request->barang,
+                'pengadaan' => $request->pengadaan,
                 'pemeliharaan' => $request->pemeliharaan,
-                'harga'        => $request->harga,
-                'kategori'     => $request->kategori,
-                'status'       => $request->status,
+                'harga' => $request->harga,
+                'kategori' => $request->kategori,
+                'status' => $request->status,
             ]);
 
             DB::commit();
 
             return response()->json([
-                'status'  => true,
+                'status' => true,
                 'message' => 'Data barang berhasil dibuat!',
-                'data'    => $barang
+                'data' => $barang
             ], 201);
         } catch (\Throwable $th) {
             DB::rollBack();
             Log::error('Error creating master barang data: ' . $th->getMessage());
 
             return response()->json([
-                'status'  => false,
+                'status' => false,
                 'message' => 'Data barang gagal dibuat!',
-                'error'   => $th->getMessage()
+                'error' => $th->getMessage()
             ], 500);
         }
     }
 
-     public function update(Request $request, $id)
-    {
-        try {
-            $barang = MasterBarang::find($id);
-            if (!$barang) {
-                return response()->json([
-                    'status'  => false,
-                    'message' => 'Data barang tidak ditemukan!'
-                ], 404);
-            }
-
-            $validator = Validator::make($request->all(), [
-                'seri'         => 'required|string|unique:master_barang,seri,' . $id . ',master_barang_id',
-                'gambar'       => 'nullable|string',
-                'barang'       => 'required|string',
-                'pengadaan'    => 'required|date',
-                'pemeliharaan' => 'nullable|date',
-                'harga'        => 'required|numeric|min:0',
-                'kategori'     => 'required|string',
-                'status'       => 'required|in:Baik,Pemeliharaan,Rusak',
-            ]);
-
-            if ($validator->fails()) {
-                return response()->json([
-                    'status'  => false,
-                    'message' => 'Data barang tidak valid!',
-                    'errors'  => $validator->errors()
-                ], 422);
-            }
-
-            DB::beginTransaction();
-            $barang->update([
-                'seri'         => $request->seri,
-                'gambar'       => $request->gambar,
-                'barang'       => $request->barang,
-                'pengadaan'    => $request->pengadaan,
-                'pemeliharaan' => $request->pemeliharaan,
-                'harga'        => $request->harga,
-                'kategori'     => $request->kategori,
-                'status'       => $request->status,
-            ]);
-            DB::commit();
-
-            return response()->json([
-                'status'  => true,
-                'message' => 'Data barang berhasil diperbarui!',
-                'data'    => $barang->refresh()
-            ], 200);
-        } catch (\Throwable $th) {
-            DB::rollBack();
-            Log::error('Error updating master barang data: ' . $th->getMessage());
-
-            return response()->json([
-                'status'  => false,
-                'message' => 'Data barang gagal diperbarui!',
-                'error'   => $th->getMessage()
-            ], 500);
-        }
+    public function update(Request $request, $id)
+{
+    $barang = MasterBarang::find($id);
+    if (!$barang) {
+        return response()->json([
+            'status' => false,
+            'message' => 'Data barang tidak ditemukan!'
+        ], 404);
     }
+
+    $validator = Validator::make($request->all(), [
+        'seri' => 'required|string|unique:master_barang,seri,' . $id . ',master_barang_id',
+        'gambar' => 'required|image|mimes:jpeg,jpg,png,webp|max:5120',
+        'barang' => 'required|string',
+        'pengadaan' => 'required|date',
+        'pemeliharaan' => 'nullable|date',
+        'harga' => 'required|numeric|min:0',
+        'kategori' => 'required|string',
+        'status' => 'required|in:Baik,Pemeliharaan,Rusak',
+    ]);
+
+    if ($validator->fails()) {
+        return response()->json([
+            'status' => false,
+            'message' => 'Data barang tidak valid!',
+            'errors' => $validator->errors()
+        ], 422);
+    }
+
+    DB::beginTransaction();
+    try {
+        if ($request->hasFile('gambar')) {
+            $path = $request->file('gambar')->store('barang', 'public');
+        } else {
+            $path = $barang->gambar; // gunakan gambar lama jika tidak upload baru
+        }
+
+        $barang->update([
+            'seri' => $request->seri,
+            'gambar' => $path,
+            'barang' => $request->barang,
+            'pengadaan' => $request->pengadaan,
+            'pemeliharaan' => $request->pemeliharaan,
+            'harga' => $request->harga,
+            'kategori' => $request->kategori,
+            'status' => $request->status,
+        ]);
+
+        DB::commit();
+
+        return response()->json([
+            'status' => true,
+            'message' => 'Data barang berhasil diperbarui!',
+            'data' => $barang->refresh()
+        ], 200);
+    } catch (\Throwable $th) {
+        DB::rollBack();
+        Log::error('Error updating master barang data: ' . $th->getMessage());
+
+        return response()->json([
+            'status' => false,
+            'message' => 'Data barang gagal diperbarui!',
+            'error' => $th->getMessage()
+        ], 500);
+    }
+}
 
 
     public function destroy($id)
@@ -182,7 +195,7 @@ class MasterBarangController extends Controller
 
         if (!$barang) {
             return response()->json([
-                'status'  => false,
+                'status' => false,
                 'message' => 'Data barang tidak ditemukan!'
             ], 404);
         }
@@ -193,13 +206,13 @@ class MasterBarangController extends Controller
             });
 
             return response()->json([
-                'status'  => true,
+                'status' => true,
                 'message' => 'Data barang berhasil dihapus!'
             ], 200);
         } catch (\Throwable $th) {
             Log::error('Error deleting master barang data: ' . $th->getMessage());
             return response()->json([
-                'status'  => false,
+                'status' => false,
                 'message' => 'Data barang gagal dihapus!'
             ], 500);
         }
