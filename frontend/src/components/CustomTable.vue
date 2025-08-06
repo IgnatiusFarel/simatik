@@ -16,7 +16,9 @@
       :columns="columns"
       :data-source="paginatedData"
       :pagination="false"
-      row-key="key"
+      :loading="loading"
+      row-key="key" 
+      :scroll="{ x: 'max-content' }"
       :rowClassName="(_, index) => (index % 2 === 0 ? 'bg-[#f7f6fe]' : '')"
     />
 
