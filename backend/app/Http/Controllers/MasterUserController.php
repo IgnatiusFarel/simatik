@@ -39,14 +39,14 @@ class MasterUserController extends Controller
 
    public function store(Request $request)
     {
-        $validator = Validator::make($request->all(), [
-            'id'       => 'required|uuid|unique:users,id',
+         $validator = Validator::make($request->all(), [
+            'id'       => 'required|string|unique:master_users,id',
+            'foto'     => 'required|image|mimes:jpeg,jpg,png|max:5120',
+            'nama'     => 'required|string',
             'username' => 'required|string|unique:users,username',
             'email'    => 'required|email|unique:users,email',
-            'password' => 'nullable|string|min:6',
+            'password' => 'nullable|string|min:8',
             'role'     => 'required|string',
-            'foto'     => 'nullable|string',
-            'nama'     => 'required|string',
             'skpd'     => 'required|string',
             'status'   => 'required|in:Aktif,Suspend,Tidak Aktif',
         ]);
@@ -61,17 +61,21 @@ class MasterUserController extends Controller
 
         DB::beginTransaction();
         try {
+            $path = $request->hasFile('foto')
+                ? $request->file('foto')->store('user', 'public')
+                : null;          
+
             $user = User::create([
-                'id'       => $request->id,
                 'username' => $request->username,
                 'email'    => $request->email,
                 'password' => $request->password ? Hash::make($request->password) : null,
                 'role'     => $request->role,
             ]);
 
-            $masterUser = MasterUser::create([
+           $masterUser = MasterUser::create([
                 'user_id' => $user->user_id,
-                'foto'    => $request->foto,
+                'id'      => $request->id,  // nomor induk pegawai
+                'foto'    => $path,
                 'nama'    => $request->nama,
                 'skpd'    => $request->skpd,
                 'status'  => $request->status,
@@ -132,12 +136,12 @@ class MasterUserController extends Controller
             ], 404);
         }
 
-        $validator = Validator::make($request->all(), [
+       $validator = Validator::make($request->all(), [
             'username' => 'required|string|unique:users,username,' . $masterUser->user->user_id . ',user_id',
             'email'    => 'required|email|unique:users,email,' . $masterUser->user->user_id . ',user_id',
             'password' => 'nullable|string|min:6',
             'role'     => 'required|string',
-            'foto'     => 'nullable|string',
+            'foto'     => 'nullable|image|mimes:jpeg,jpg,png|max:5120',
             'nama'     => 'required|string',
             'skpd'     => 'required|string',
             'status'   => 'required|in:Aktif,Suspend,Tidak Aktif',
@@ -153,24 +157,26 @@ class MasterUserController extends Controller
 
         DB::beginTransaction();
         try {
-            $masterUser->user()->update([
+            $path = $request->hasFile('foto')
+                ? $request->file('foto')->store('user', 'public')
+                : $masterUser->foto;
+
+          $masterUser->user()->update([
                 'username' => $request->username,
                 'email'    => $request->email,
-                'password' => $request->password
-                    ? Hash::make($request->password)
-                    : $masterUser->user->password,
+                'password' => $request->password ? Hash::make($request->password) : $masterUser->user->password,
                 'role'     => $request->role,
             ]);
 
-            $masterUser->update([
-                'foto'   => $request->foto,
+             $masterUser->update([
+                'foto'   => $path,
                 'nama'   => $request->nama,
                 'skpd'   => $request->skpd,
                 'status' => $request->status,
             ]);
 
-            DB::commit();
 
+            DB::commit();
             return response()->json([
                 'status'  => true,
                 'message' => 'Data user berhasil diperbarui!',

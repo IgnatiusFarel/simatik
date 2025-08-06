@@ -15,21 +15,62 @@
 </template>
 
 <script setup>
-import { h, onMounted, ref } from "vue";
-import { Tag } from "ant-design-vue";
+import { h, ref, onMounted } from "vue";
+import { Tag, Image } from "ant-design-vue";
 import { Plus } from "lucide-vue-next";
 import CustomTable from '../CustomTable.vue';
 import Api from "@/services/Api.js"; 
+import dayjs from "dayjs";
 
 const loading = ref(false); 
 const dataTable = ref([]);
+const APP_URL = import.meta.env.VITE_APP_URL;
 
 const columns = [
   { title: "No. Seri", dataIndex: "seri" },
-  { title: "Barang", dataIndex: "barang" },
-  { title: "Tahun Pengadaan", dataIndex: "pengadaan" },
-  { title: "Pemeliharaan", dataIndex: "pemeliharaan" },
-  { title: "Harga Barang", dataIndex: "harga" },
+  {
+    title: "Barang",
+    dataIndex: "barang",
+    customRender: ({ record }) => {
+      const imgSrc = record.gambar.startsWith("uploads/")
+        ? `${APP_URL}/${record.gambar}` 
+        : `${APP_URL}/storage/${record.gambar}`;
+
+      return h("div", { class: "flex items-center gap-2" }, [
+        h(Image, {
+          src: imgSrc,
+          width: 80,
+          height: 80,
+          style: { borderRadius: "4px", objectFit: "cover" },
+          fallback:
+            "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAMIAAADDCAYAAADQvc6UAAAB...",
+          preview: { src: imgSrc },
+        }),
+        h("span", record.barang),
+      ]);
+    },
+  },
+  {
+    title: "Tahun Pengadaan",
+    dataIndex: "pengadaan",
+    customRender: ({ text }) => (text ? dayjs(text).format("DD/MM/YY") : "-"),
+  },
+  {
+    title: "Pemeliharaan",
+    dataIndex: "pemeliharaan",
+    customRender: ({ text }) => (text ? dayjs(text).format("DD/MM/YY") : "-"),
+  },
+  {
+    title: "Harga Barang",
+    dataIndex: "harga",
+    customRender: ({ text }) =>
+      text
+        ? new Intl.NumberFormat("id-ID", {
+            style: "currency",
+            currency: "IDR",
+          }).format(text)
+        : "-",
+  },
   { title: "Kategori", dataIndex: "kategori" },
     {
     title: "Status",

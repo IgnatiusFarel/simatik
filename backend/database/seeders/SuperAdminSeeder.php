@@ -12,27 +12,50 @@ class SuperAdminSeeder extends Seeder
 {
     public function run(): void
     {
-        // Generate UUID untuk user
-        $userId = (string) Str::uuid();
+        // ===== Superadmin Utama =====
+        $superadmin1 = User::updateOrCreate(
+            ['username' => 'superadmin'],
+            [
+                'user_id'  => (string) Str::uuid(),
+                'email'    => 'superadmin@gmail.com',
+                'password' => '12345678',
+                'role'     => 'superadmin',
+            ]
+        );
 
-        // Insert ke table users
-        $user = User::create([
-            'user_id'  => $userId,
-            'id'       => 'SA-001',
-            'username' => 'superadmin',
-            'email'    => 'superadmin@example.com',
-            'password' => Hash::make('password123'),
-            'role'     => 'superadmin'
-        ]);
+        MasterUser::updateOrCreate(
+            ['id' => '#FRL-01-SUPER'],
+            [
+                'master_user_id' => (string) Str::uuid(),
+                'user_id'        => $superadmin1->user_id,
+                'foto'           => 'default.png',
+                'nama'           => 'Super Admin',
+                'skpd'           => 'Pusat',
+                'status'         => 'Aktif',
+            ]
+        );
 
-        // Insert ke master_users
-        MasterUser::create([
-            'master_user_id' => (string) Str::uuid(),
-            'user_id'        => $user->user_id,
-            'foto'           => 'default.png',
-            'nama'           => 'Super Admin',
-            'skpd'           => 'Pusat',
-            'status'         => 'Aktif'
-        ]);
+        // ===== Superadmin Kedua =====
+        $superadmin2 = User::updateOrCreate(
+            ['username' => 'superadmin2'],
+            [
+                'user_id'  => (string) Str::uuid(),
+                'email'    => 'superadmin2@gmail.com',
+               'password' => '12345678',
+                'role'     => 'superadmin',
+            ]
+        );
+
+        MasterUser::updateOrCreate(
+            ['id' => '#FRL-02-SUPER'],
+            [
+                'master_user_id' => (string) Str::uuid(),
+                'user_id'        => $superadmin2->user_id,
+                'foto'           => 'default.png',
+                'nama'           => 'Super Admin 2',
+                'skpd'           => 'Pusat',
+                'status'         => 'Aktif',
+            ]
+        );
     }
 }

@@ -13,7 +13,7 @@ class MasterUser extends Model
     protected $primaryKey = 'master_user_id';
     public $incrementing = false;
     protected $keyType = 'string';
-    protected $fillable = ['user_id', 'foto', 'nama', 'skpd', 'status'];
+    protected $fillable = ['user_id', 'id', 'foto', 'nama', 'skpd', 'status'];
 
     protected static function booted()
     {
