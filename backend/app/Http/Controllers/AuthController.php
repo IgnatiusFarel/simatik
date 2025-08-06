@@ -27,7 +27,7 @@ class AuthController extends Controller
 
         if (!$user || !Hash::check($credentials['password'], $user->password)) {
             throw ValidationException::withMessages([
-                'username' => ['Username atau password salah.'],
+                'login' => ['Username atau password salah.'],
             ]);
         }
         
