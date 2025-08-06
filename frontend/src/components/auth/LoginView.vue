@@ -14,7 +14,7 @@
           :rules="rules"
           class="w-full"
           hideRequiredMark
-            @finish="handleLogin"
+          @finish="handleLogin"
         >
           <a-form-item label="Email/Username" name="login">
             <a-input
@@ -89,14 +89,15 @@ const formData = reactive({
 
 const rules = {
   login: [
-    { required: true, message: "Email atau Username wajib diisi" },
+    { required: true, message: "Email atau Username wajib diisi!" },
     // { type: "email", message: "Format email tidak valid" },
   ],
   password: [
-    { required: true, message: "Password wajib diisi" },
-    { min: 8, message: "Password minimal 8 karakter" },
+    { required: true, message: "Password wajib diisi!" },
+    { min: 8, message: "Password minimal 8 karakter!" },
   ],
 };
+
 const handleLogin = async () => {
   try {
     loading.value = true;
