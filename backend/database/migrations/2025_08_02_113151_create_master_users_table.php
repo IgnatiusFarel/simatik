@@ -11,6 +11,7 @@ class CreateMasterUsersTable extends Migration
         Schema::create('master_users', function (Blueprint $table) {
             $table->uuid('master_user_id')->primary(); ;
             $table->uuid('user_id');
+            $table->string('id')->unique(); 
             $table->string('foto');
             $table->string('nama');
             $table->string('skpd');
