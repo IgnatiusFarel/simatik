@@ -9,19 +9,19 @@
     <template #title>
       <h2 class="text-center w-full text-lg font-semibold">Tambah Barang</h2>
     </template>
-    <a-form layout="vertical" ref="formRef" hideRequiredMark>
-      <a-form-item label="Nomor Seri Barang" :rules="rules.seri">
-        <a-input v-model:value="form.seri" placeholder="Masukkan Nomor Seri" />
+    <a-form layout="vertical" ref="formRef"  :model="formData" :rules="rules" hideRequiredMark>
+      <a-form-item label="Nomor Seri Barang" name="seri">
+        <a-input v-model:value="formData.seri" placeholder="Masukkan Nomor Seri Barang"> <template #prefix>#</template></a-input>
       </a-form-item>
-
-      <a-form-item label="Gambar Barang" :rules="rules.gambar">
+      <a-form-item label="Gambar Barang" name="gambar">
         <div class="clearfix">
           <a-upload
-            v-model:file-list="fileList"
-            action="https://www.mocky.io/v2/5cc8019d300000980a055e76"
+            :before-upload="beforeUpload"
+            :file-list="fileList"
             list-type="picture-card"
-            @preview="handlePreview"
             :max-count="1"
+            @preview="handlePreview"
+            @remove="handleRemove"
           >
             <template v-if="fileList.length === 0">
             <div class="flex flex-col items-center justify-center">
@@ -40,40 +40,44 @@
           </a-modal>
         </div>
       </a-form-item>
-      <a-form-item label="Nama Barang" :rules="rules.barang">
+      <a-form-item label="Nama Barang" name="barang">
         <a-input
-          v-model:value="form.barang"
-          placeholder="Masukkan Nama Barang"
+          v-model:value="formData.barang"
+          placeholder="Masukkan Nama Barang"                    
         />
       </a-form-item>
-      <a-form-item label="Tahun Pengadaan Barang" :rules="rules.pengadaan">
-        <a-date-picker v-model:value="form.pengadaan" :format="dateFormat" class="w-full" placeholder="Pilih Tahun Pengadaan Barang" />
+      <a-form-item label="Tahun Pengadaan Barang" name="pengadaan">
+        <a-date-picker v-model:value="formData.pengadaan" :format="dateFormat" class="w-full" placeholder="Pilih Tahun Pengadaan Barang" />
       </a-form-item>
-      <a-form-item label="Tahun Pemeliharaan Barang" :rules="rules.pemeliharaan">
-        <a-date-picker v-model:value="form.pemeliharaan" :format="dateFormat" class="w-full" placeholder="Pilih Tahun Pemeliharaan Barang" />
+      <a-form-item label="Tahun Pemeliharaan Barang" name="pemeliharaan">
+        <a-date-picker v-model:value="formData.pemeliharaan" :format="dateFormat" class="w-full" placeholder="Pilih Tahun Pemeliharaan Barang" />
       </a-form-item>
-      <a-form-item label="Harga Barang" :rules="rules.harga">
+      <a-form-item label="Harga Barang" name="harga">
         <a-input
-          v-model:value="form.harga"
-          placeholder="Masukkan Harga Barang"
+          v-model:value="formData.harga"
+          placeholder="Masukkan Harga Barang"          
+          prefix="Rp"
+            @keypress="onKeyPressNumber"
+          @input="onHargaInput"
         />
       </a-form-item>
-      <a-form-item label="Kategori Barang" :rules="rules.kategori">
+      <a-form-item label="Kategori Barang" name="kategori">
         <a-input
-          v-model:value="form.kategori"
+          v-model:value="formData.kategori"
           placeholder="Masukkan Kategori Barang"
         />
       </a-form-item>
-      <a-form-item label="Status Barang" :rules="rules.status">
+      <a-form-item label="Status Barang" name="status">
         <a-select
-          v-model:value="form.status"
+          v-model:value="formData.status"
           :options="statusOptions"
           placeholder="Pilih Status Barang"
         />
       </a-form-item>
       <div class="flex justify-center gap-2">
         <a-button @click="handleCancel">Batal</a-button>
-        <a-button type="primary" @click="handleSave" class="font-semibold">
+        <a-button type="primary" @click="handleSave" class="font-semibold" :loading="loading"
+            :disabled="loading">
           Simpan</a-button
         >
       </div>
@@ -82,29 +86,34 @@
 </template>
 
 <script setup>
-import { ref, defineExpose } from "vue";
-import { Plus } from "lucide-vue-next";
+import { ref, defineExpose, watch } from "vue";
+import { Plus, Upload } from "lucide-vue-next";
+import Api from "@/services/Api.js";
+import { message } from 'ant-design-vue'
 
 const isOpen = ref(false);
 const formRef = ref(null);
 const loading = ref(false);
 const fileList = ref([]);
 const dateFormat = 'DD/MM/YYYY';
+const previewVisible = ref(false);
+const previewImage = ref("");
+const previewTitle = ref("");
+const emit = defineEmits(['saved']); 
 
 const rules = {
-  seri: [{ required: true, message: "Nomor seri wajib diisi!" }],
+  seri: [{ required: true, message: "Nomor seri barang wajib diisi!" }],
+  gambar: [{ required: true, message: "Gambar barang wajib diisi!" }],
   barang: [{ required: true, message: "Nama barang wajib diisi!" }],
-  pengadaan: [{ required: true, message: "Tanggal pengadaan wajib diisi!" }],
-  pemeliharaan: [
-    { required: true, message: "Tanggal pemeliharaan wajib diisi!" },
-  ],
-  harga: [{ required: true, message: "Harga barang wajib diisi!" }],
+  pengadaan: [{ required: true, message: "Tanggal pengadaan barang wajib diisi!" }],  
+  harga: [{ required: true, message: "Harga barang wajib diisi!" },  { pattern: /^[0-9]+$/, message: "Hanya boleh angka!" }],
   kategori: [{ required: true, message: "Kategori barang wajib diisi!" }],
   status: [{ required: true, message: "Status barang wajib diisi!" }],
 };
 
-const form = ref({
+const formData = ref({
   seri: "",
+  gambar: null,
   barang: "",
   pengadaan: "",
   pemeliharaan: "",
@@ -119,14 +128,19 @@ const statusOptions = [
   { value: "Rusak", label: "Rusak" },
 ];
 
-const openModal = () => {
-  isOpen.value = true;
+const onKeyPressNumber = (event) => {  
+  const charCode = event.charCode;
+  if (charCode < 48 || charCode > 57) {
+    event.preventDefault();
+  }
 };
-const handleCancel = () => {
-  isOpen.value = false;
-};
-const handleSave = () => {
-  isOpen.value = false;
+
+const onHargaInput = (e) => {
+  let numeric = e.target.value.replace(/\D/g, "");
+  if (numeric.length > 15) {
+    numeric = numeric.slice(0, 15);
+  }
+  formData.value.harga = numeric;
 };
 
 function getBase64(file) {
@@ -138,24 +152,89 @@ function getBase64(file) {
   });
 }
 
-const previewVisible = ref(false);
-const previewImage = ref("");
-const previewTitle = ref("");
+async function beforeUpload(file) {
+  const isAllowedType = ['image/jpeg', 'image/jpg', 'image/png'].includes(file.type);
+  if (!isAllowedType) {
+    message.error("Format file harus JPG, JPEG dan PNG!");
+    return Upload.LIST_IGNORE; 
+  }
+  const isLt5M = file.size / 1024 / 1024 < 5; 
+  if (!isLt5M) {
+    message.error("Ukuran file harus di bawah 5MB!");
+    return Upload.LIST_IGNORE; 
+  }
+
+  file.thumbUrl = await getBase64(file);
+  
+  file.originFileObj = file;
+  fileList.value = [file];
+  formData.value.gambar = file;
+
+  return false;
+}
+
+const handlePreview = async (file) => {
+  previewImage.value = file.thumbUrl || (file.url ? file.url : await getBase64(file.originFileObj));
+  previewVisible.value = true;
+  previewTitle.value = file.name || 'Preview';
+};
 
 const handleExitPreview = () => {
   previewVisible.value = false;
   previewTitle.value = "";
 };
 
-const handlePreview = async (file) => {
-  if (!file.url && !file.preview) {
-    file.preview = await getBase64(file.originFileObj);
-  }
-  previewImage.value = file.url || file.preview;
-  previewVisible.value = true;
-  previewTitle.value =
-    file.name || file.url.substring(file.url.lastIndexOf("/") + 1);
+function handleRemove() {
+  fileList.value = []
+}
+
+const openModal = () => {
+  isOpen.value = true;
 };
+
+const handleCancel = () => {
+  isOpen.value = false
+  formRef.value.resetFields()
+  fileList.value = []
+}
+
+const handleSave = async () => {
+  try {
+    await formRef.value.validate()
+    loading.value = true
+
+    const fd = new FormData()
+    fd.append('seri', `#${formData.value.seri}`)
+    fd.append('barang', formData.value.barang)
+    fd.append('pengadaan', formData.value.pengadaan)
+    fd.append('pemeliharaan', formData.value.pemeliharaan)
+    fd.append('harga', formData.value.harga)
+    fd.append('kategori', formData.value.kategori)
+    fd.append('status', formData.value.status)
+
+    if (fileList.value.length) {
+      fd.append('gambar', fileList.value[0].originFileObj)
+    }
+
+    await Api.post('/master-barang', fd)
+    message.success('Data barang berhasil ditambahkan!')
+    isOpen.value = false
+
+    emit('saved')
+  } catch (error) {
+    console.error(error)
+    message.error("Data barang gagal ditambahkan!")
+  } finally {
+    loading.value = false
+  }
+}
+
+watch(isOpen, (open) => {
+  if (open) {
+    formRef.value?.resetFields()
+    fileList.value = []
+  }
+})
 
 defineExpose({
   openModal,
