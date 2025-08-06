@@ -52,10 +52,7 @@ const columns = [
   { title: "Nama", dataIndex: "nama", width: 200 },
   { title: "Username", dataIndex: ["user", "username"], width: 180 },
   { title: "Email", dataIndex: ["user", "email"], width: 250 },
-  { title: "SKPD", dataIndex: "skpd", width: 250 },
-  { title: "Role", dataIndex: ["user", "role"], width: 150 },
-  { title: "Email", dataIndex: ["user", "email"], width: 250 },
-  { title: "SKPD", dataIndex: "skpd", width: 250 },
+  { title: "SKPD", dataIndex: "skpd", width: 250 },    
   { title: "Role", dataIndex: ["user", "role"], width: 150 },
   {
     title: "Status",
