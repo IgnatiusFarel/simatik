@@ -25,6 +25,11 @@ class MasterBarang extends Model
         'status'
     ];
 
+    protected $casts = [
+        'pengadaan' => 'date',
+        'pemeliharaan' => 'date',
+    ];
+
     protected static function booted()
     {
         static::creating(function ($model) {
