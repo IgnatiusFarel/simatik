@@ -1,12 +1,10 @@
 <template>
-  <main class="w-full h-[96px] flex items-center justify-between px-2 border-b border-[#E9EAEC] bg-white">
-    <!-- LEFT: Collapse + Search -->
+  <main class="w-full h-[96px] flex items-center justify-between px-3 border-b border-[#E9EAEC] bg-white">
     <div class="flex items-center gap-4">
       <a-button type="text" class="p-2" @click="$emit('toggle-sidebar')">
         <Menu class="w-5 h-5" />
       </a-button>
-
-      <!-- Search Input -->
+      
       <a-dropdown trigger="click" placement="bottomLeft">
         <template #overlay>
           <a-menu class="max-h-[240px] overflow-auto">
@@ -35,15 +33,13 @@
         </a-input>
       </a-dropdown>
     </div>
-
-    <!-- RIGHT: Notification + Avatar -->
-    <div class="flex items-center gap-4">
-      <!-- Notification Dropdown -->
-      <a-dropdown trigger="click" placement="bottomRight">
+    
+    <div class="flex items-center gap-4">      
+      <a-dropdown trigger="click" placement="bottomRight" class="border rounded-full" >
         <template #overlay>
           <div class="w-[300px] max-h-[300px] overflow-y-auto bg-white rounded-lg shadow p-3">
             <div class="flex justify-between items-center mb-2">
-              <span class="font-semibold text-sm">Notifikasi</span>
+              <span class="font-semibold text-sm">🔔 Notifikasi</span>
               <a-button type="link" size="small" @click.stop="toggleAllNotifications">
                 {{ showAllNotifications ? 'Tampilkan 3' : 'Lihat semua' }}
               </a-button>
@@ -51,7 +47,7 @@
             <div
               v-for="(notif, index) in displayedNotifications"
               :key="index"
-              class="p-2 rounded-md hover:bg-gray-50 cursor-pointer mb-1"
+              class="p-2 rounded-md hover:bg-gray-50 cursor-pointer mb-1 border"
             >
               <p class="font-medium text-sm">{{ notif.title }}</p>
               <p class="text-xs text-gray-500">{{ notif.time }}</p>
@@ -70,14 +66,13 @@
           </a-button>
         </a-badge>
       </a-dropdown>
-
-      <!-- Profile + Logout -->
-      <a-dropdown trigger="click" placement="bottomRight">
+      
+      <a-dropdown trigger="click" placement="bottomRight" class="border">
         <template #overlay>
           <a-menu>
             <a-menu-item key="logout" @click="() => handleProfileSelect('logout')">
-              <div class="flex items-center gap-2">
-                <LogOut class="w-4 h-4 text-red-500" />
+              <div class="flex items-center gap-2 text-red-500">
+                <LogOut class="w-4 h-4" />
                 <span>Logout</span>
               </div>
             </a-menu-item>
@@ -138,7 +133,7 @@ const goToRoute = (item) => {
 
 const handleProfileSelect = (key) => {
   if (key === "logout") {
-    auth.logout(); // clear token + redirect ke /login
+    auth.logout(); 
     message.success("Logout Berhasil!");
   }
 };
@@ -147,3 +142,4 @@ const toggleAllNotifications = () => {
   showAllNotifications.value = !showAllNotifications.value;
 };
 </script>
+
