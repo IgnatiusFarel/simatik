@@ -1,8 +1,8 @@
 <template>
-  <CustomTable :columns="columns" :data="dataTable">
+  <CustomTable :columns="columns" :data="filteredDataBySearch">
     <template #header-filter>
       <a-input
-        v-model="search"
+        v-model:value="search" 
         type="text"
         placeholder="Search..."
         class="rounded-[8px] pl-3 pr-3 py-1 text-sm w-60 h-[34px] border-[#9E9E9E]"
@@ -16,7 +16,7 @@
     <template #header-action>
       <a-button
         type="primary"
-        class="flex items-center gap-2 text-white px-3 py-1 rounded-[8px] font-semibold"
+        class="transition-transform transform active:scale-95 flex items-center gap-2 text-white px-3 py-1 rounded-[8px] font-semibold"
         @click="openAddBarang"
       >
         <Plus class="w-4 h-4" /> Add Barang</a-button
@@ -24,15 +24,15 @@
     </template>
   </CustomTable>
   <AddBarang ref="addBarangRef" @saved="fetchData" />
-  <EditBarang ref="editBarangRef" />
+  <EditBarang ref="editBarangRef" @saved="fetchData "/>
 </template>
 
 <script setup>
-import { h, ref, onMounted } from "vue";
-import { Tag, Image } from "ant-design-vue";
+import { h, ref, onMounted, createVNode, computed } from "vue";
+import { Tag, Image, Modal, message } from "ant-design-vue";
 import AddBarang from "./AddBarang.vue";
 import CustomTable from "../CustomTable.vue";
-import { SquarePen, Search, Trash2, Plus } from "lucide-vue-next";
+import { SquarePen, Search, Trash2, Plus, OctagonAlert } from "lucide-vue-next";
 import Api from "@/services/Api.js";
 import dayjs from "dayjs";
 
@@ -40,14 +40,15 @@ const addBarangRef = ref(null);
 const editBarangRef = ref(null);
 const dataTable = ref([]);
 const loading = ref(false);
+const search = ref("");
 const APP_URL = import.meta.env.VITE_APP_URL;
 
 const openAddBarang = () => {
   addBarangRef.value.openModal();
 };
 
-const openEditBarang = () => {
-  editBarangRef.value.openModal();
+const openEditBarang = (record) => {
+  editBarangRef.value.openModal(record);
 };
 
 const columns = [
@@ -57,7 +58,7 @@ const columns = [
     dataIndex: "barang",
     customRender: ({ record }) => {
       const imgSrc = record.gambar.startsWith("uploads/")
-        ? `${APP_URL}/${record.gambar}` 
+        ? `${APP_URL}/${record.gambar}`
         : `${APP_URL}/storage/${record.gambar}`;
 
       return h("div", { class: "flex items-center gap-2" }, [
@@ -75,12 +76,12 @@ const columns = [
     },
   },
   {
-    title: "Tahun Pengadaan",
+    title: "Tanggal Pengadaan",
     dataIndex: "pengadaan",
     customRender: ({ text }) => (text ? dayjs(text).format("DD/MM/YY") : "-"),
   },
   {
-    title: "Pemeliharaan",
+    title: "Tanggal Pemeliharaan",
     dataIndex: "pemeliharaan",
     customRender: ({ text }) => (text ? dayjs(text).format("DD/MM/YY") : "-"),
   },
@@ -119,7 +120,7 @@ const columns = [
           "button",
           {
             class: "text-red-500 hover:text-red-700",
-            onClick: () => console.log("Delete", record),
+            onClick: () => handleDelete(record),
           },
           [h(Trash2, { size: 18 })]
         ),
@@ -140,6 +141,21 @@ const getStatusTagColor = (status) => {
   }
 };
 
+const filteredDataBySearch = computed(() => {  
+  const keyword = search.value.toLowerCase().trim();
+  
+  if (!keyword) {
+    return dataTable.value;
+  }
+
+  return dataTable.value.filter(item => {
+    const seriMatch = item.seri?.toLowerCase().includes(keyword);
+    const barangMatch = item.barang?.toLowerCase().includes(keyword);
+    return seriMatch || barangMatch;
+  });
+});
+
+
 const fetchData = async () => {
   loading.value = true;
   try {
@@ -151,6 +167,42 @@ const fetchData = async () => {
     loading.value = false;
   }
 };
+
+function handleDelete(record) {
+  Modal.confirm({
+    centered: true,
+    closable: true,
+    title: createVNode("div", { class: "flex items-center gap-2" }, [
+      h(OctagonAlert, { size: 24, class: "text-red-500" }),
+      h(
+        "span",
+        {},
+        `Apakah Anda yakin ingin menghapus data barang '${record.barang}'?`
+      ),
+    ]),
+    icon: null,
+    content: null, 
+    okText: createVNode("span", { class: "font-semibold" }, "Ya, Hapus"),
+    okType: "primary",
+    cancelText: "Batal",
+    async onOk() {
+      try {
+        const response = await Api.delete(
+          `/master-barang/${record.master_barang_id}`
+        );
+        if (response.data.status) {
+          message.success(response.data.message);
+          fetchData();
+        } else {
+          message.error(response.data.message || "Gagal menghapus data");
+        }
+      } catch (error) {
+        message.error("Terjadi kesalahan saat menghapus");
+        console.error(error);
+      }
+    },
+  });
+}
 
 onMounted(() => {
   fetchData();
