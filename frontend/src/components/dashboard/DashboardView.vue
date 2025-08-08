@@ -1,91 +1,112 @@
 <template>
   <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 mb-4">
     <AssetCard
-      total="1.234"
-      title="Semua Aset"
-      subTitle="Aset TIK"
-      subtitleDesc="Semua Aset"
-      percentage="100%"
+      v-for="(card, index) in cards"
+      :key="index"
+      :total="card.total"
+      :title="card.title"
+      :subTitle="card.subTitle"
+      :subtitleDesc="card.subtitleDesc"
+      :percentage="card.percentage"
       :isCollapsed="isSidebarCollapsed"
-    />
-    <AssetCard
-      total="534"
-      title="Aset Digunakan"
-      subTitle="Aset TIK"
-      subtitleDesc="Digunakan"
-      percentage="43%"
-      :isCollapsed="isSidebarCollapsed"
-    />
-    <AssetCard
-      total="700"
-      title="Aset Cadangan"
-      subTitle="Aset TIK"
-      subtitleDesc="Cadangan"
-      percentage="57%"
-      :isCollapsed="isSidebarCollapsed"
-    />
+    />    
   </div>
+
   <CustomTable :columns="columns" :data="dataTable">
     <template #header-action>
-      <span class="text-sm">Recent History</span>
+      <span class="text-sm">⏱ Recent History</span>
     </template>
   </CustomTable>
-  <EditBarang ref="editBarangRef" />
 </template>
 
 <script setup>
 import { h, onMounted, ref } from "vue";
-import { Tag } from "ant-design-vue";
+import { Tag, Image } from "ant-design-vue";
 import AssetCard from "./AssetCard.vue";
-import EditBarang from "./EditBarang.vue";
 import CustomTable from "../CustomTable.vue";
-import { SquarePen, Trash2 } from "lucide-vue-next";
 import Api from "@/services/Api.js";
+import dayjs from "dayjs";
 
 const isSidebarCollapsed = false;
-const editBarangRef = ref(false)
-const loading = ref(false); 
+const loading = ref(false);
 const dataTable = ref([]);
+const APP_URL = import.meta.env.VITE_APP_URL;
 
-const openEditBarang = () => {
-  editBarangRef.value.openModal(); 
-}
+const cards = ref([
+  {
+    title: "Aset Baik",
+    subTitle: "Aset TIK",
+    subtitleDesc: "Kondisi Baik",
+    total: 0,
+    percentage: "0%",
+  },
+  {
+    title: "Aset Pemeliharaan",
+    subTitle: "Aset TIK",
+    subtitleDesc: "Kondisi Pemeliharaan",
+    total: 0,
+    percentage: "0%",
+  },
+  {
+    title: "Aset Rusak",
+    subTitle: "Aset TIK",
+    subtitleDesc: "Kondisi Rusak",
+    total: 0,
+    percentage: "0%",
+  },
+]);
 
 const columns = [
   { title: "No. Seri", dataIndex: "seri" },
-  { title: "Barang", dataIndex: "barang" },
-  { title: "Tahun Pengadaan", dataIndex: "pengadaan" },
-  { title: "Pemeliharaan", dataIndex: "pemeliharaan" },
-  { title: "Harga Barang", dataIndex: "harga" },
+  {
+    title: "Barang",
+    dataIndex: "barang",
+    customRender: ({ record }) => {
+      const imgSrc = record.gambar.startsWith("uploads/")
+        ? `${APP_URL}/${record.gambar}`
+        : `${APP_URL}/storage/${record.gambar}`;
+
+      return h("div", { class: "flex items-center gap-2" }, [
+        h(Image, {
+          src: imgSrc,
+          width: 80,
+          height: 80,
+          style: { borderRadius: "4px", objectFit: "cover" },
+          fallback:
+            "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAMIAAADDCAYAAADQvc6UAAAB...",
+          preview: { src: imgSrc },
+        }),
+        h("span", record.barang),
+      ]);
+    },
+  },
+  {
+    title: "Tanggal Pengadaan",
+    dataIndex: "pengadaan",
+    customRender: ({ text }) => (text ? dayjs(text).format("DD/MM/YY") : "-"),
+  },
+  {
+    title: "Tanggal Pemeliharaan",
+    dataIndex: "pemeliharaan",
+    customRender: ({ text }) => (text ? dayjs(text).format("DD/MM/YY") : "-"),
+  },
+  {
+    title: "Harga Barang",
+    dataIndex: "harga",
+    customRender: ({ text }) =>
+      text
+        ? new Intl.NumberFormat("id-ID", {
+            style: "currency",
+            currency: "IDR",
+          }).format(text)
+        : "-",
+  },
   { title: "Kategori", dataIndex: "kategori" },
   {
     title: "Status",
     dataIndex: "status",
     customRender: ({ record }) =>
       h(Tag, { color: getStatusTagColor(record.status) }, () => record.status),
-  },
-  {
-    title: "Action",
-    key: "action",
-    customRender: ({ record }) =>
-      h("div", { class: "flex space-x-2" }, [
-        h(
-          "button",
-          {
-            class: "text-blue-500 hover:text-blue-700",
-            onClick: () => openEditBarang(record),
-          },
-          [h(SquarePen, { size: 18 })]
-        ),
-        h(
-          "button",
-          {
-            class: "text-red-500 hover:text-red-700",
-            onClick: () => console.log("Delete", record),
-          },
-          [h(Trash2, { size: 18 })]
-        ),
-      ]),
   },
 ];
 
@@ -103,20 +124,39 @@ const getStatusTagColor = (status) => {
 };
 
 const fetchData = async () => {
-  loading.value=true; 
+  loading.value = true;
   try {
-    const response = await Api.get('/master-barang'); 
-    dataTable.value = response.data.data.data; 
+    const response = await Api.get("/dashboard");
+    dataTable.value = response.data.data.data;
   } catch (error) {
     message.error(error);
-  } finally { 
-    loading.value=false; 
+  } finally {
+    loading.value = false;
   }
-}
+};
+
+const fetchDataAsset = async () => {
+  try {
+    const response = await Api.get("dashboard/asset");
+    const data = response.data.data;
+
+    cards.value[0].total = data.baik.jumlah;
+    cards.value[0].percentage = `${data.baik.persen}%`;
+
+    cards.value[1].total = data.pemeliharaan.jumlah;
+    cards.value[1].percentage = `${data.pemeliharaan.persen}%`;
+
+    cards.value[2].total = data.rusak.jumlah;
+    cards.value[2].percentage = `${data.rusak.persen}%`;
+  } catch (error) {
+    console.error(error);
+  }
+};
 
 onMounted(() => {
   fetchData();
-}) 
+  fetchDataAsset();
+});
 </script>
 
 <style></style>
