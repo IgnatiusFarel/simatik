@@ -1,8 +1,11 @@
 <template>
-  <CustomTable :columns="columns" :data="dataTable" :search="search"  rowKey="master_user_id">
+  <CustomTable
+    :columns="columns"
+   :data="filteredDataBySearch">
+  >
     <template #header-filter>
       <a-input
-        v-model="search"
+        v-model:value="search"
         type="text"
         placeholder="Search..."
         class="rounded-[8px] pl-3 pr-3 py-1 text-sm w-60 h-[34px] border-[#9E9E9E]"
@@ -15,56 +18,80 @@
     </template>
     <template #header-action>
       <a-button
-        class="flex items-center gap-2 bg-[#d30007] text-white px-3 py-1 rounded-[8px] font-semibold" @click="openAddUser"
+        class="transition-transform transform active:scale-95 flex items-center gap-2 bg-[#d30007] text-white px-3 py-1 rounded-[8px] font-semibold"
+        @click="openAddUser"
       >
         <Plus class="w-4 h-4" /> Add User</a-button
       >
     </template>
-  </CustomTable>  
-  <AddUser ref="addUserRef" />
-  <EditUser ref="editUserRef" />
+  </CustomTable>
+   <AddUser ref="addUserRef" @saved="fetchData" />
+  <EditUser ref="editUserRef" @saved="fetchData "/>
 </template>
 
 <script setup>
-import { h, ref, onMounted } from "vue";
-import { Tag } from "ant-design-vue";
+import { h, ref, onMounted, createVNode, computed } from "vue";
+import { Tag, Image, Modal, message } from "ant-design-vue";
 import AddUser from "./AddUser.vue";
-import CustomTable from "../CustomTable.vue";
-import { SquarePen, Trash2, Plus, Search } from "lucide-vue-next";
 import EditUser from "./EditUser.vue";
-import Api from "@/services/Api.js"
+import CustomTable from "../CustomTable.vue";
+import { SquarePen, Trash2, Plus, Search, OctagonAlert, Edit } from "lucide-vue-next";
+import Api from "@/services/Api.js";
 
-const dataTable = ref([]); 
-const loading = ref(false)
-const addUserRef = ref(null); 
-const editUserRef = ref(null); 
+const dataTable = ref([]);
+const loading = ref(false);
+const addUserRef = ref(null);
+const editUserRef = ref(null);
+const search = ref("");
+const APP_URL = import.meta.env.VITE_APP_URL;
 
 const openAddUser = () => {
   addUserRef.value.openModal();
-}
+};
 
-const openEditUser = () => {
-  editUserRef.value.openModal();
-}
+const openEditUser = (record) => {
+  editUserRef.value.openModal(record);
+};
 
 const columns = [
-  { title: "Id", dataIndex: ["user", "id"], width: 150 },
-  { title: "Nama", dataIndex: "nama", width: 200 },
+  { title: "Id", dataIndex: "id", width: 150 },
+  {
+    title: "Nama",
+    dataIndex: "nama",
+    customRender: ({ record }) => {
+      const imgSrc = record.foto.startsWith("uploads/")
+        ? `${APP_URL}/${record.foto}`
+        : `${APP_URL}/storage/${record.foto}`;
+
+      return h("div", { class: "flex items-center gap-2" }, [
+        h(Image, {
+          src: imgSrc,
+          width: 80,
+          height: 80,
+          style: { borderRadius: "4px", objectFit: "cover" },
+          fallback:
+            "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAMIAAADDCAYAAADQvc6UAAAB...",
+          preview: { src: imgSrc },
+        }),
+        h("span", record.nama),
+      ]);
+    },
+  },
   { title: "Username", dataIndex: ["user", "username"], width: 180 },
   { title: "Email", dataIndex: ["user", "email"], width: 250 },
-  { title: "SKPD", dataIndex: "skpd", width: 250 },    
+  { title: "SKPD", dataIndex: "skpd", width: 250 },
   { title: "Role", dataIndex: ["user", "role"], width: 150 },
   {
     title: "Status",
     dataIndex: "status",
-     width: 120,
+    width: 120,
     customRender: ({ record }) =>
       h(Tag, { color: getStatusTagColor(record.status) }, () => record.status),
   },
   {
     title: "Action",
     key: "action",
-     width: 120,
+    width: 120,
     customRender: ({ record }) =>
       h("div", { class: "flex space-x-2" }, [
         h(
@@ -79,7 +106,7 @@ const columns = [
           "button",
           {
             class: "text-red-500 hover:text-red-700",
-            onClick: () => console.log("Delete", record),
+            onClick: () => handleDelete(record),
           },
           [h(Trash2, { size: 18 })]
         ),
@@ -100,21 +127,71 @@ const getStatusTagColor = (status) => {
   }
 };
 
+const filteredDataBySearch = computed(() => {
+const keyword = search.value.toLowerCase().trim();
+
+  if (!keyword) {
+    return dataTable.value;
+  };
+
+  return dataTable.value.filter(item => {
+    const idMatch = item.id?.toLowerCase().includes(keyword);
+    const namaMatch = item.nama?.toLowerCase().includes(keyword); 
+    return idMatch || namaMatch;
+  })
+});
+
 const fetchData = async () => {
-  loading.value =  true; 
+  loading.value = true;
   try {
-    const response = await Api.get('/master-user');
-    dataTable.value = response.data.data.data;   
+    const response = await Api.get("/master-user");
+    dataTable.value = response.data.data.data;
   } catch (error) {
     console.error(error);
-  } finally{
-    loading.value =  false;
+  } finally {
+    loading.value = false;
   }
+};
+
+function handleDelete(record) {
+  Modal.confirm({
+    centered: true,
+    closable: true,
+    title: createVNode("div", { class: "flex items-center gap-2" }, [
+      h(OctagonAlert, { size: 24, class: "text-red-500" }),
+      h(
+        "span",
+        {},
+        `Apakah Anda yakin ingin menghapus data user '${record.nama}'?`
+      ),
+    ]),
+    icon: null,
+    content: null, 
+    okText: createVNode("span", { class: "font-semibold" }, "Ya, Hapus"),
+    okType: "primary",
+    cancelText: "Batal",
+    async onOk() {
+      try {
+        const response = await Api.delete(
+          `/master-user/${record.master_users_id}`
+        );
+        if (response.data.status) {
+          message.success(response.data.message);
+          fetchData();
+        } else {
+          message.error(response.data.message || "Gagal menghapus data");
+        }
+      } catch (error) {
+        message.error("Terjadi kesalahan saat menghapus");
+        console.error(error);
+      }
+    },
+  });
 }
 
 onMounted(() => {
   fetchData();
-})
+});
 </script>
 
 <style></style>

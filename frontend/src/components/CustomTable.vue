@@ -1,6 +1,6 @@
 <template>
   <div class="bg-white shadow-sm p-4 rounded-md">
-    <div class="flex items-center justify-between mb-4 flex-wrap gap-4">
+    <div class="flex items-center justify-between mb-4 flex-wrap gap-2">
       <div class="flex items-center gap-4 flex-wrap">
         <div class="flex items-center gap-2">
           <label class="text-sm font-medium">Show</label>
@@ -77,15 +77,13 @@ watch([search, pageSize], () => {
   current.value = 1;
 });
 
-// Custom render pagination item with Tailwind bg-primary
 const customItemRender = ({ type, originalElement, page }) => {
   if (type === "prev") {
     return h("a", { class: "text-sm px-2" }, "Previous");
   }
   if (type === "next") {
     return h("a", { class: "text-sm px-2" }, "Next");
-  }
-  // Active page styling
+  }  
   const isActive = page === current.value;
   return h(
     "a",

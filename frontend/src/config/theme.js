@@ -17,6 +17,9 @@ export default {
       controlHeight: 46,    
       borderRadius: 12
     }, 
-    
+     DatePicker: {
+      controlHeight: 46,  
+      borderRadius: 12
+    }
   },
 }

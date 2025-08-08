@@ -9,7 +9,7 @@
       <p class="font-medium text-white text-sm">{{ subTitle }}</p>
       <p class="font-bold text-white text-base">{{ subtitleDesc }}</p>
 
-      <div class="absolute top-1/2 right-5 transform -translate-y-1/2 flex items-center gap-2">
+      <div class="absolute top-1/2 right-3 transform -translate-y-1/2 flex items-center gap-1">
         <span class="font-bold text-white text-base">{{  percentage  }}</span>
         <div class="bg-white rounded-full p-1">
           <TrendingUp class="w-4 h-4 text-green-500" />

@@ -12,8 +12,7 @@
           ref="formRef"
           :model="formData"
           :rules="rules"
-          class="w-full"
-          hideRequiredMark
+          class="w-full"          
           @finish="handleLogin"
         >
           <a-form-item label="Email/Username" name="login">
@@ -46,9 +45,9 @@
           </div>
 
           <a-button
+            block
             type="primary"
             html-type="submit"
-            block
             :loading="loading"
             :disabled="loading"
             class="transition-transform transform active:scale-95 border-none w-full rounded-xl h-[46px] font-semibold"            
@@ -89,8 +88,7 @@ const formData = reactive({
 
 const rules = {
   login: [
-    { required: true, message: "Email atau Username wajib diisi!" },
-    // { type: "email", message: "Format email tidak valid" },
+    { required: true, message: "Email atau Username wajib diisi!" },    
   ],
   password: [
     { required: true, message: "Password wajib diisi!" },
@@ -111,7 +109,5 @@ const handleLogin = async () => {
     loading.value = false;
   }
 };
-
-
 
 </script>
