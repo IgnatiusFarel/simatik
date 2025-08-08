@@ -74,7 +74,7 @@ class MasterUserController extends Controller
 
            $masterUser = MasterUser::create([
                 'user_id' => $user->user_id,
-                'id'      => $request->id,  // nomor induk pegawai
+                'id'      => $request->id,  
                 'foto'    => $path,
                 'nama'    => $request->nama,
                 'skpd'    => $request->skpd,
