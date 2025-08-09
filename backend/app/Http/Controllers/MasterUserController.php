@@ -12,30 +12,46 @@ use App\Models\User;
 
 class MasterUserController extends Controller
 {
-    public function index(Request $request)
-    {
-        try {
-            $perPage = (int) $request->query('page_size', 10);
-
-            if (!in_array($perPage, [10, 25, 50, 100])) {
-                $perPage = 10;
-            }
-
-            $users = MasterUser::with('user')->orderByDesc('updated_at')->orderByDesc('created_at')->paginate($perPage);
-            return response()->json([
-                'status' => true,
-                'message' => 'Data user berhasil diambil!',
-                'data' => $users,
-            ], 200);
-        } catch (\Throwable $th) {
-            Log::error('Error fetching user data: ' . $th->getMessage());
-
-            return response()->json([
-                'status' => false,
-                'message' => 'Data user gagal diambil!'
-            ], 500);
+  public function index(Request $request)
+{
+    try {
+        $search = $request->query('search');
+        $perPage = (int) $request->query('page_size', 10);
+        if (!in_array($perPage, [10, 25, 50, 100])) {
+            $perPage = 10;
         }
+
+        $query = MasterUser::with('user');
+
+        if ($search) {
+            $query->where(function ($q) use ($search) {
+                $q->where('nama', 'like', '%' . $search . '%')
+                  ->orWhere('id', 'like', '%' . $search . '%')
+                  ->orWhereHas('user', function ($q2) use ($search) {
+                      $q2->where('username', 'like', '%' . $search . '%')
+                         ->orWhere('email', 'like', '%' . $search . '%');
+                  });
+            });
+        }
+
+        $data = $query->orderByDesc('updated_at')
+            ->orderByDesc('created_at')
+            ->paginate($perPage);
+
+        return response()->json([
+            'status' => true,
+            'message' => 'Data user berhasil diambil!',
+            'data' => $data,
+        ], 200);
+    } catch (\Throwable $th) {
+        Log::error('Error fetching user data: ' . $th->getMessage());
+        return response()->json([
+            'status' => false,
+            'message' => 'Data user gagal diambil!'
+        ], 500);
     }
+}
+
 
     public function store(Request $request)
     {
