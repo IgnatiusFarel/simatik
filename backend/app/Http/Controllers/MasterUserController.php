@@ -175,7 +175,7 @@ class MasterUserController extends Controller
             ]);
 
             $masterUser->update([
-                'id' => $request->id,  
+                'id' => $request->id,
                 'foto' => $path,
                 'nama' => $request->nama,
                 'skpd' => $request->skpd,
