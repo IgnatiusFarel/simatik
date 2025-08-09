@@ -96,8 +96,8 @@
           :disabled="loading"
           class="transition-transform transform active:scale-95 border-none font-semibold"
         >
-          <span v-if="loading">Menyimpan...</span>
-          <span v-else>Simpan</span>
+          <span v-if="loading">Memperbarui...</span>
+          <span v-else>Perbarui</span>
         </a-button>
       </div>
     </a-form>
@@ -203,29 +203,29 @@ const openModal = (record) => {
   isOpen.value = true;
 
   formData.value = {
-    id: record.master_user_id || "",
-    foto: record.foto || null,            // nanti di-handle di fileList
+    master_user_id: record.master_user_id || "",
+    id: record.id?.replace(/^#/, "") || "",
+    foto: record.foto || null,         
     nama: record.nama || "",
     username: record.user.username || "",
     email: record.user.email || "",
-    password: "",          // kosongkan password saat edit, jika ingin diubah harus diisi
+    password: "",        
     skpd: record.skpd || "",
     role: record.user.role || "",
     status: record.status || null,
   };
-
-  // Set fileList jika ada foto (untuk ant-design upload preview)
+  
  if (record.foto) {
     const imageUrl = record.foto.startsWith("uploads/")
       ? `${import.meta.env.VITE_APP_URL}/${record.foto}`
       : `${import.meta.env.VITE_APP_URL}/storage/${record.foto}`;
 
-    fileList.value = [{
-        uid: '-1',
+      fileList.value = [{
+      uid: '-1',
       name: 'foto.jpg',
       status: 'done',
       url: imageUrl,
-      thumbUrl: imageUrl,// tidak ada file object asli dari server
+      thumbUrl: imageUrl,
     }];
   } else {
     fileList.value = [];
@@ -257,7 +257,7 @@ const handleSave = async () => {
       fd.append("foto", fileList.value[0].originFileObj);
     }
 
-    await Api.post(`/master-user/${formData.value.id}`, fd, {
+    await Api.post(`/master-user/${formData.value.master_user_id}`, fd, {
       headers: { 'Content-Type': 'multipart/form-data' }
     });
 
@@ -273,7 +273,7 @@ const handleSave = async () => {
 };
 
 watch(isOpen, (open) => {
-  if (open) {
+  if (!open) {
     formRef.value?.resetFields();
     fileList.value = [];
   }
