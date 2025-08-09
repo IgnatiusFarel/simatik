@@ -1,5 +1,10 @@
 <template>
-   <CustomTable :columns="columns" :data="filteredDataByDate">
+   <CustomTable :columns="columns" :data="dataTable" :loading="loading"
+    :currentPage="currentPage"
+    :pageSize="pageSize"
+    :totalItems="totalItems"
+    @page-change="handlePageChange"
+    @page-size-change="handlePageSizeChange">
     <template #header-filter>
       <a-range-picker v-model:value="selectedDateRange" class="h-[34px] rounded-[8px] border-[#9E9E9E]" />
     </template>
@@ -17,7 +22,7 @@
 </template>
 
 <script setup>
-import { h, ref, onMounted, computed } from "vue";
+import { h, ref, onMounted, watch } from "vue";
 import { Tag, Image, message } from "ant-design-vue";
 import { Plus } from "lucide-vue-next";
 import CustomTable from '../CustomTable.vue';
@@ -29,7 +34,11 @@ dayjs.extend(isBetween);
 
 const loading = ref(false); 
 const dataTable = ref([]);
+const totalItems = ref(0);
+const currentPage = ref(1);
+const pageSize = ref(10);
 const selectedDateRange = ref(null);
+
 const APP_URL = import.meta.env.VITE_APP_URL;
 
 const columns = [
@@ -99,34 +108,34 @@ const getStatusTagColor = (status) => {
   }
 };
 
-const filteredDataByDate = computed(() => {
-  if (!Array.isArray(selectedDateRange.value) || selectedDateRange.value.length < 2) {
-    return dataTable.value;
-  }
-
-  const [start, end] = selectedDateRange.value;
-  if (!start || !end) return dataTable.value;
-
-  const from = dayjs(start).startOf("day");
-  const to = dayjs(end).endOf("day");
-
-  return dataTable.value.filter((item) => {
-    const tgl = dayjs(item.pengadaan);
-    return tgl.isBetween(from, to, null, "[]");
-  });
-});
-
-const fetchData = async () => {
-  loading.value=true;
+const fetchData = async (page = currentPage.value, size = pageSize.value) => {
+  loading.value = true;
   try {
-    const response = await Api.get('/report-barang');
-    dataTable.value= response.data.data.data; 
+    currentPage.value = page;
+    pageSize.value = size;
+
+    let params = {
+      page_size: size,
+      page: page,
+    };
+
+    if (Array.isArray(selectedDateRange.value) && selectedDateRange.value.length === 2) {
+      params.from = dayjs(selectedDateRange.value[0]).format("YYYY-MM-DD");
+      params.to = dayjs(selectedDateRange.value[1]).format("YYYY-MM-DD");
+    }
+
+    const response = await Api.get("/report-barang", { params });
+
+    const apiData = response.data.data;
+    dataTable.value = apiData.data;
+    totalItems.value = apiData.total;
+    currentPage.value = apiData.current_page;
   } catch (error) {
-    message.error(error)
+    message.error(error.message || "Gagal mengambil data");
   } finally {
-    loading.value=false;
+    loading.value = false;
   }
-}
+};
 
 const handlePrint = async () => {
   if (!Array.isArray(selectedDateRange.value) || selectedDateRange.value.length < 2) {
@@ -170,6 +179,18 @@ const handlePrint = async () => {
     loading.value = false;
   }
 };
+
+const handlePageChange = (page) => {
+  fetchData(page, pageSize.value);
+};
+
+const handlePageSizeChange = (size) => {
+  fetchData(1, size);
+};
+
+watch(selectedDateRange, () => {
+  fetchData(1, pageSize.value);
+});
 
 onMounted(() => {
   fetchData();
