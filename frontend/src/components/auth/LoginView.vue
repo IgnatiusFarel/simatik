@@ -1,6 +1,13 @@
 <template>
   <main class="flex h-screen">
-    <div class="hidden lg:block w-1/2 bg-black"></div>
+    <div class="hidden lg:block w-1/2 relative">
+  <img
+    src="https://images.unsplash.com/photo-1707157281599-d155d1da5b4c?q=80&w=1170&auto=format&fit=crop&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D"
+    alt="background"
+    class="absolute inset-0 w-full h-full object-cover"
+  />
+</div>
+
     <div class="w-full lg:w-1/2 flex items-center justify-center">
       <div class="w-full max-w-[480px] px-4 space-y-4">
         <div class="flex justify-center">
