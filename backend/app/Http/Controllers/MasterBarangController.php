@@ -12,15 +12,26 @@ use Illuminate\Support\Facades\Validator;
 
 class MasterBarangController extends Controller
 {
+
     public function index(Request $request)
     {
         try {
+            $search = $request->query('search');
             $perPage = (int) $request->query('page_size', 10);
             if (!in_array($perPage, [10, 25, 50, 100])) {
                 $perPage = 10;
             }
 
-            $data = MasterBarang::orderByDesc('updated_at')
+            $query = MasterBarang::query();
+
+            if ($search) {
+                $query->where(function ($q) use ($search) {
+                    $q->where('barang', 'like', '%' . $search . '%')
+                        ->orWhere('seri', 'like', '%' . $search . '%');
+                });
+            }
+
+            $data = $query->orderByDesc('updated_at')
                 ->orderByDesc('created_at')
                 ->paginate($perPage);
 
@@ -162,7 +173,7 @@ class MasterBarangController extends Controller
         }
 
         DB::beginTransaction();
-        try {            
+        try {
             if ($request->hasFile('gambar')) {
                 $path = $request->file('gambar')->store('barang', 'public');
             } else {
@@ -212,11 +223,11 @@ class MasterBarangController extends Controller
 
         try {
             DB::transaction(function () use ($barang) {
-                
+
                 if ($barang->gambar && Storage::disk('public')->exists($barang->gambar)) {
                     Storage::disk('public')->delete($barang->gambar);
                 }
-                
+
                 $barang->delete();
             });
 
