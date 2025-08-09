@@ -1,7 +1,13 @@
 <template>
-  <CustomTable
+    <CustomTable
     :columns="columns"
-   :data="filteredDataBySearch">
+    :data="dataTable"
+    :loading="loading"
+    :currentPage="currentPage"
+    :pageSize="pageSize"
+    :totalItems="totalItems"
+    @page-change="handlePageChange"
+    @page-size-change="handlePageSizeChange"
   >
     <template #header-filter>
       <a-input
@@ -30,7 +36,7 @@
 </template>
 
 <script setup>
-import { h, ref, onMounted, createVNode, computed } from "vue";
+import { h, ref, onMounted, createVNode, watch } from "vue";
 import { Tag, Image, Modal, message } from "ant-design-vue";
 import AddUser from "./AddUser.vue";
 import EditUser from "./EditUser.vue";
@@ -38,11 +44,15 @@ import CustomTable from "../CustomTable.vue";
 import { SquarePen, Trash2, Plus, Search, OctagonAlert, Edit } from "lucide-vue-next";
 import Api from "@/services/Api.js";
 
-const dataTable = ref([]);
-const loading = ref(false);
 const addUserRef = ref(null);
 const editUserRef = ref(null);
+const loading = ref(false);
 const search = ref("");
+const dataTable = ref([]);
+const totalItems = ref(0);
+const currentPage = ref(1);
+const pageSize = ref(10);
+
 const APP_URL = import.meta.env.VITE_APP_URL;
 
 const openAddUser = () => {
@@ -127,27 +137,26 @@ const getStatusTagColor = (status) => {
   }
 };
 
-const filteredDataBySearch = computed(() => {
-const keyword = search.value.toLowerCase().trim();
-
-  if (!keyword) {
-    return dataTable.value;
-  };
-
-  return dataTable.value.filter(item => {
-    const idMatch = item.id?.toLowerCase().includes(keyword);
-    const namaMatch = item.nama?.toLowerCase().includes(keyword); 
-    return idMatch || namaMatch;
-  })
-});
-
-const fetchData = async () => {
+const fetchData = async (page = currentPage.value, size = pageSize.value) => {
   loading.value = true;
   try {
-    const response = await Api.get("/master-user");
-    dataTable.value = response.data.data.data;
+    currentPage.value = page;
+    pageSize.value = size;
+
+    const response = await Api.get("/master-user", {
+      params: {
+        page_size: size,
+        page: page,
+        search: search.value.trim() || undefined, 
+      },
+    });
+
+    const apiData = response.data.data;
+    dataTable.value = apiData.data;
+    totalItems.value = apiData.total;
+    currentPage.value = apiData.current_page;
   } catch (error) {
-    console.error(error);
+    message.error(error.message || "Gagal mengambil data");
   } finally {
     loading.value = false;
   }
@@ -188,6 +197,18 @@ function handleDelete(record) {
     },
   });
 }
+
+const handlePageChange = (page) => {
+  fetchData(page, pageSize.value);
+};
+
+const handlePageSizeChange = (size) => {
+  fetchData(1, size);
+};
+
+watch(search, (newVal, oldVal) => {  
+  fetchData(1, pageSize.value);
+});
 
 onMounted(() => {
   fetchData();
