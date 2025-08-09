@@ -199,7 +199,7 @@ const openModal = (record) => {
   isOpen.value = true;
   
   formData.value = {
-    id: record.master_barang_id,
+    master_barang_id: record.master_barang_id,
     seri: record.seri?.replace(/^#/, "") || "", 
     gambar: record.gambar || null,
     barang: record.barang || "",
@@ -251,7 +251,7 @@ const handleSave = async () => {
       fd.append('gambar', fileList.value[0].originFileObj);
     }
 
-    await Api.post(`/master-barang/${formData.value.id}`, fd, {
+    await Api.post(`/master-barang/${formData.value.master_barang_id}`, fd, {
       headers: { 'Content-Type': 'multipart/form-data' }
     });
 

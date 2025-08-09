@@ -27,7 +27,7 @@ class MasterBarang extends Model
 
     protected $casts = [
         'pengadaan' => 'date',
-        'pemeliharaan' => 'date',
+        'pemeliharaan' => 'date',        
     ];
 
     protected static function booted()

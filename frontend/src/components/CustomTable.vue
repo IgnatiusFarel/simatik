@@ -1,10 +1,15 @@
 <template>
   <div class="bg-white shadow-sm p-4 rounded-md">
-    <div class="flex items-center justify-between mb-4 flex-wrap gap-2">
+    <div class="flex items-center justify-between mb-4 flex-wrap gap-4">
       <div class="flex items-center gap-4 flex-wrap">
         <div class="flex items-center gap-2">
           <label class="text-sm font-medium">Show</label>
-          <a-select v-model:value="pageSize" :options="pageSizeOptions"  class="page-size-select" />
+           <a-select
+          :value="pageSize"
+          @change="handlePageSizeChange"
+          :options="pageSizeOptions"
+          class="page-size-select"
+        />
           <span class="text-sm">entries</span>
         </div>
         <slot name="header-filter"></slot>
@@ -14,7 +19,7 @@
 
     <a-table
       :columns="columns"
-      :data-source="paginatedData"
+       :data-source="data"
       :pagination="false"
       :loading="loading"
       row-key="key" 
@@ -24,9 +29,9 @@
 
     <div class="flex justify-center mt-4">
       <a-pagination
-        v-model:current="current"
+        :current="currentPage"
         :page-size="pageSize"
-        :total="filteredData.length"
+        :total="totalItems"
         @change="onPageChange"
         :itemRender="customItemRender"        
       />
@@ -37,14 +42,16 @@
 <script setup>
 import { h, ref, computed, watch } from "vue";
 
+const emit = defineEmits(["page-change", "page-size-change"]);
+
 const props = defineProps({
   data: { type: Array, required: true },
   columns: { type: Array, required: true },
+  loading: { type: Boolean, default: false },
+  currentPage: { type: Number, required: true },
+  pageSize: { type: Number, required: true },
+  totalItems: { type: Number, required: true },
 });
-
-const current = ref(1);
-const pageSize = ref(10);
-const search = ref("");
 
 const pageSizeOptions = [
   { value: 10, label: "10" },
@@ -53,38 +60,40 @@ const pageSizeOptions = [
   { value: 100, label: "100" },
 ];
 
-const onPageChange = (page) => {
-  current.value = page;
-};
+function handlePageSizeChange(value) {
+  emit("page-size-change", value);
+  emit("page-change", 1); 
+}
 
-const filteredData = computed(() => {
-  if (!search.value) return props.data ?? [];
-  return (props.data ?? []).filter((item) =>
-    Object.values(item).some((val) =>
-      String(val).toLowerCase().includes(search.value.toLowerCase())
-    )
-  );
-});
+function onPageChange(page) {
+  emit("page-change", page);
+}
 
-const paginatedData = computed(() => {
-  const data = filteredData.value ?? [];
-  const start = (current.value - 1) * pageSize.value;
-  const end = start + pageSize.value;
-  return data.slice(start, end);
-});
+// const filteredData = computed(() => {
+//   if (!search.value) return props.data ?? [];
+//   return (props.data ?? []).filter((item) =>
+//     Object.values(item).some((val) =>
+//       String(val).toLowerCase().includes(search.value.toLowerCase())
+//     )
+//   );
+// });
 
-watch([search, pageSize], () => {
-  current.value = 1;
-});
+// const paginatedData = computed(() => {
+//   const data = filteredData.value ?? [];
+//   const start = (current.value - 1) * pageSize.value;
+//   const end = start + pageSize.value;
+//   return data.slice(start, end);
+// });
 
-const customItemRender = ({ type, originalElement, page }) => {
-  if (type === "prev") {
-    return h("a", { class: "text-sm px-2" }, "Previous");
-  }
-  if (type === "next") {
-    return h("a", { class: "text-sm px-2" }, "Next");
-  }  
-  const isActive = page === current.value;
+// watch([search, pageSize], () => {
+//   current.value = 1;
+// });
+
+const customItemRender = ({ type, page }) => {
+  if (type === "prev") return h("a", { class: "text-sm px-2" }, "Previous");
+  if (type === "next") return h("a", { class: "text-sm px-2" }, "Next");
+
+  const isActive = page === props.currentPage;
   return h(
     "a",
     {

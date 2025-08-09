@@ -1,8 +1,17 @@
 <template>
-  <CustomTable :columns="columns" :data="filteredDataBySearch">
+  <CustomTable
+    :columns="columns"
+    :data="dataTable"
+    :loading="loading"
+    :currentPage="currentPage"
+    :pageSize="pageSize"
+    :totalItems="totalItems"
+    @page-change="handlePageChange"
+    @page-size-change="handlePageSizeChange"
+  >
     <template #header-filter>
       <a-input
-        v-model:value="search" 
+        v-model:value="search"
         type="text"
         placeholder="Search..."
         class="rounded-[8px] pl-3 pr-3 py-1 text-sm w-60 h-[34px] border-[#9E9E9E]"
@@ -24,11 +33,11 @@
     </template>
   </CustomTable>
   <AddBarang ref="addBarangRef" @saved="fetchData" />
-  <EditBarang ref="editBarangRef" @saved="fetchData "/>
+  <EditBarang ref="editBarangRef" @saved="fetchData" />
 </template>
 
 <script setup>
-import { h, ref, onMounted, createVNode, computed } from "vue";
+import { h, ref, onMounted, createVNode, watch } from "vue";
 import { Tag, Image, Modal, message } from "ant-design-vue";
 import AddBarang from "./AddBarang.vue";
 import CustomTable from "../CustomTable.vue";
@@ -38,9 +47,13 @@ import dayjs from "dayjs";
 
 const addBarangRef = ref(null);
 const editBarangRef = ref(null);
-const dataTable = ref([]);
 const loading = ref(false);
 const search = ref("");
+const dataTable = ref([]);
+const totalItems = ref(0);
+const currentPage = ref(1);
+const pageSize = ref(10);
+
 const APP_URL = import.meta.env.VITE_APP_URL;
 
 const openAddBarang = () => {
@@ -141,28 +154,26 @@ const getStatusTagColor = (status) => {
   }
 };
 
-const filteredDataBySearch = computed(() => {  
-  const keyword = search.value.toLowerCase().trim();
-  
-  if (!keyword) {
-    return dataTable.value;
-  }
-
-  return dataTable.value.filter(item => {
-    const seriMatch = item.seri?.toLowerCase().includes(keyword);
-    const barangMatch = item.barang?.toLowerCase().includes(keyword);
-    return seriMatch || barangMatch;
-  });
-});
-
-
-const fetchData = async () => {
+const fetchData = async (page = currentPage.value, size = pageSize.value) => {
   loading.value = true;
   try {
-    const response = await Api.get("/master-barang");
-    dataTable.value = response.data.data.data;
+    currentPage.value = page;
+    pageSize.value = size;
+
+    const response = await Api.get("/master-barang", {
+      params: {
+        page_size: size,
+        page: page,
+        search: search.value.trim() || undefined, 
+      },
+    });
+
+    const apiData = response.data.data;
+    dataTable.value = apiData.data;
+    totalItems.value = apiData.total;
+    currentPage.value = apiData.current_page;
   } catch (error) {
-    message.error(error);
+    message.error(error.message || "Gagal mengambil data");
   } finally {
     loading.value = false;
   }
@@ -181,7 +192,7 @@ function handleDelete(record) {
       ),
     ]),
     icon: null,
-    content: null, 
+    content: null,
     okText: createVNode("span", { class: "font-semibold" }, "Ya, Hapus"),
     okType: "primary",
     cancelText: "Batal",
@@ -203,6 +214,18 @@ function handleDelete(record) {
     },
   });
 }
+
+const handlePageChange = (page) => {
+  fetchData(page, pageSize.value);
+};
+
+const handlePageSizeChange = (size) => {
+  fetchData(1, size);
+};
+
+watch(search, (newVal, oldVal) => {  
+  fetchData(1, pageSize.value);
+});
 
 onMounted(() => {
   fetchData();

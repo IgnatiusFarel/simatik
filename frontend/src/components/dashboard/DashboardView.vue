@@ -12,7 +12,13 @@
     />    
   </div>
 
-  <CustomTable :columns="columns" :data="dataTable">
+  <CustomTable :columns="columns" :data="dataTable"     :loading="loading"
+    :currentPage="currentPage"
+    :pageSize="pageSize"
+    :totalItems="totalItems"
+    @page-change="handlePageChange"
+    @page-size-change="handlePageSizeChange"
+  >
     <template #header-action>
       <span class="text-sm">⏱ Recent History</span>
     </template>
@@ -30,6 +36,10 @@ import dayjs from "dayjs";
 const isSidebarCollapsed = false;
 const loading = ref(false);
 const dataTable = ref([]);
+const totalItems = ref(0);
+const currentPage = ref(1);
+const pageSize = ref(10);
+
 const APP_URL = import.meta.env.VITE_APP_URL;
 
 const cards = ref([
@@ -123,13 +133,25 @@ const getStatusTagColor = (status) => {
   }
 };
 
-const fetchData = async () => {
+const fetchData = async (page = currentPage.value, size = pageSize.value) => {
   loading.value = true;
   try {
-    const response = await Api.get("/dashboard");
-    dataTable.value = response.data.data.data;
+    currentPage.value = page;
+    pageSize.value = size;
+
+    const response = await Api.get("/dashboard", {
+      params: {
+        page_size: size,
+        page: page,         
+      },
+    });
+
+    const apiData = response.data.data;
+    dataTable.value = apiData.data;
+    totalItems.value = apiData.total;
+    currentPage.value = apiData.current_page;
   } catch (error) {
-    message.error(error);
+    message.error(error.message || "Gagal mengambil data");
   } finally {
     loading.value = false;
   }
@@ -151,6 +173,14 @@ const fetchDataAsset = async () => {
   } catch (error) {
     console.error(error);
   }
+};
+
+const handlePageChange = (page) => {
+  fetchData(page, pageSize.value);
+};
+
+const handlePageSizeChange = (size) => {
+  fetchData(1, size);
 };
 
 onMounted(() => {
