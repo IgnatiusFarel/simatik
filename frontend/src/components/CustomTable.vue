@@ -1,6 +1,6 @@
 <template>
   <div class="bg-white shadow-sm p-4 rounded-md">
-    <div class="flex items-center justify-between mb-4 flex-wrap gap-2">
+    <div class="flex items-center justify-between mb-4 flex-wrap gap-4">
       <div class="flex items-center gap-4 flex-wrap">
         <div class="flex items-center gap-2">
           <label class="text-sm font-medium">Show</label>
