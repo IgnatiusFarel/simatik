@@ -229,10 +229,9 @@ const handleCancel = () => {
 };
 
 const handleSave = async () => {
+  loading.value = true;
   try {
     // await formRef.value.validate();
-    loading.value = true;
-
     const fd = new FormData();
     fd.append("seri", `#${formData.value.seri}`);
     fd.append("barang", formData.value.barang);

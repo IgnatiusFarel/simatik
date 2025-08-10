@@ -1,13 +1,13 @@
 <script setup>
 import { useHead } from '@vueuse/head';
-import LoginView from '@/components/auth/LoginView.vue';
+import ForgotPasswordView from '@/components/auth/ForgotPasswordView.vue';
 
 useHead({
-  title: 'Halaman Login - SIMATIK',
+  title: 'Halaman Forgot Password - SIMATIK',
    meta: [
     {
       name: 'description',
-      content: 'Masuk ke SIMATIK untuk mengelola dan memantau aset TIK organisasi Anda secara real-time.',
+      content: 'Atur ulang kata sandi Anda untuk dapat kembali mengakses sistem informasi manajemen aset TIK SIMATIK.',
     },
     {
       name: 'keywords',
@@ -43,5 +43,5 @@ useHead({
 </script>
 
 <template>
-  <LoginView />
+  <ForgotPasswordView />
 </template>

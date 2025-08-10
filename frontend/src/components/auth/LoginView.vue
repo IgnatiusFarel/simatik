@@ -15,8 +15,7 @@
         </div>
 
         <a-form
-          layout="vertical"
-          ref="formRef"
+          layout="vertical"          
           :model="formData"
           :rules="rules"
           class="w-full"          
@@ -46,6 +45,7 @@
             </a-checkbox>
             <a
               class="text-sm text-[#657081] font-medium hover:underline hover:text-blue-500 cursor-pointer"
+               href="/forgot-password"
             >
               Forgot Password
             </a>
@@ -84,7 +84,6 @@ import { message } from "ant-design-vue";
 import router from "@/router";
 
 const auth = useAuthStore();
-const formRef = ref();
 const loading = ref(false);
 
 const formData = reactive({
