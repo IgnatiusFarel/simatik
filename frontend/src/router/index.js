@@ -1,6 +1,7 @@
 import { createRouter, createWebHistory } from "vue-router";
 import { useAuthStore } from "@/stores/auth";
 import LoginPage from "@/pages/auth/LoginPage.vue";
+import ForgotPasswordPage from "@/pages/auth/ForgotPasswordPage.vue";
 import DashboardPage from "@/pages/dashboard/DashboardPage.vue";
 import MasterBarangPage from "@/pages/master-data/MasterBarangPage.vue";
 import MasterUserPage from "@/pages/master-data/MasterUserPage.vue";
@@ -15,6 +16,11 @@ const routes = [
   {
     path: "/login",
     component: LoginPage,
+    meta: { public: true, layout: "empty" },
+  },
+  {
+    path: "/forgot-password",
+    component: ForgotPasswordPage,
     meta: { public: true, layout: "empty" },
   },
   {
