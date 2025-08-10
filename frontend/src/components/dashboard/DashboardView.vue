@@ -151,6 +151,7 @@ const fetchData = async (page = currentPage.value, size = pageSize.value) => {
     totalItems.value = apiData.total;
     currentPage.value = apiData.current_page;
   } catch (error) {
+    message.destroy();
     message.error(error.message || "Gagal mengambil data");
   } finally {
     loading.value = false;

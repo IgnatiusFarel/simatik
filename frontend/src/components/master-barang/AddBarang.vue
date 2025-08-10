@@ -183,11 +183,13 @@ async function beforeUpload(file) {
     file.type
   );
   if (!isAllowedType) {
+    message.destroy();
     message.error("Format file harus JPG, JPEG dan PNG!");
     return Upload.LIST_IGNORE;
   }
   const isLt5M = file.size / 1024 / 1024 < 5;
   if (!isLt5M) {
+    message.destroy();
     message.error("Ukuran file harus di bawah 5MB!");
     return Upload.LIST_IGNORE;
   }
@@ -244,6 +246,7 @@ const handleSave = async () => {
     if (fileList.value.length) {
       fd.append("gambar", fileList.value[0].originFileObj);
     }
+    message.destroy();
 
     await Api.post("/master-barang", fd);
     message.success("Data barang berhasil ditambahkan!");
@@ -251,7 +254,7 @@ const handleSave = async () => {
 
     emit("saved");
   } catch (error) {
-    console.error(error);
+    message.destroy();
     message.error("Data barang gagal ditambahkan!");
   } finally {
     loading.value = false;

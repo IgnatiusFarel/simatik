@@ -105,11 +105,12 @@ const rules = {
 const handleLogin = async () => {
   try {
     loading.value = true;
-    await auth.login(toRaw(formData));
+    message.destroy();
+    await auth.login(toRaw(formData));    
     message.success("Login Berhasil!");
     router.push("/dashboard");
   } catch (error) {
-    console.error("Error login:", error);
+    message.destroy();
     message.error(error?.message || "Login Gagal!");
   } finally {
     loading.value = false;

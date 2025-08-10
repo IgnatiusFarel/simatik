@@ -221,13 +221,14 @@ const handleSendOtp = async () => {
     const fd = new FormData();
     fd.append("email", formData.email);
     await Api.post("/send-otp", fd);
+    message.destroy();
 
     message.success("Kode OTP berhasil dikirimkan ke email anda", 3);
     current.value = 1;
     otpInputs.value = ["", "", "", ""];
     startCountdown();
   } catch (error) {
-    console.log(error);
+    message.destroy();    
     message.error(error?.response?.data?.message || "Email anda tidak terdaftar", 3);
   } finally {
     loading.value = false;
@@ -255,12 +256,13 @@ const verifyOtpRealtime = async (otp) => {
   try {
     const payload = { email: formData.email, otp };
     await Api.post("/verify-otp", payload);
-
+    message.destroy();
     message.success("OTP benar, silakan ganti password", 3);
     current.value = 2;
 
     verifiedOtp.value = otp; 
   } catch (error) {
+    message.destroy();
     message.error(
       error?.response?.data?.message ||
         "Kode OTP salah atau sudah kadaluarsa! Silakan cek email atau kirim ulang OTP.",
@@ -274,6 +276,7 @@ const verifyOtpRealtime = async (otp) => {
 
 const handleResendOtp = async () => {
   if (countdown.value > 0) {
+    message.destroy();
     message.info(`Silakan tunggu ${countdown.value} detik sebelum mengirim ulang OTP`);
     return;
   }
@@ -299,10 +302,11 @@ const handleSubmit = async () => {
       password_confirmation: formData.password_confirmation,
     };
     await Api.post("/reset-password", payload);
-
+    message.destroy();
     message.success("Password berhasil diubah. Silakan login kembali.", 3);
    await router.push("/login"); 
   } catch (error) {
+    message.destroy();
     message.error(error?.response?.data?.message || "Gagal mengubah password", 3);
   } finally {
     loading.value = false;

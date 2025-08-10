@@ -173,6 +173,7 @@ const fetchData = async (page = currentPage.value, size = pageSize.value) => {
     totalItems.value = apiData.total;
     currentPage.value = apiData.current_page;
   } catch (error) {
+    message.destroy();
     message.error(error.message || "Gagal mengambil data");
   } finally {
     loading.value = false;
@@ -202,14 +203,16 @@ function handleDelete(record) {
           `/master-barang/${record.master_barang_id}`
         );
         if (response.data.status) {
+          message.destroy();
           message.success(response.data.message);
           fetchData();
         } else {
+          message.destroy();
           message.error(response.data.message || "Gagal menghapus data");
         }
       } catch (error) {
-        message.error("Terjadi kesalahan saat menghapus");
-        console.error(error);
+        message.destroy();
+        message.error("Terjadi kesalahan saat menghapus");        
       }
     },
   });
