@@ -131,6 +131,7 @@ const fetchData = async (page = currentPage.value, size = pageSize.value) => {
     totalItems.value = apiData.total;
     currentPage.value = apiData.current_page;
   } catch (error) {
+    message.destroy();
     message.error(error.message || "Gagal mengambil data");
   } finally {
     loading.value = false;
@@ -139,11 +140,13 @@ const fetchData = async (page = currentPage.value, size = pageSize.value) => {
 
 const handlePrint = async () => {
   if (!Array.isArray(selectedDateRange.value) || selectedDateRange.value.length < 2) {
+    message.destroy();
     message.warning("Pilih rentang tanggal yang mau di print terlebih dahulu!");
     return;
   }
 
   if (filteredDataByDate.value.length === 0) {
+    message.destroy();
     message.warning("Tidak ada data barang di tanggal tersebut!");
     return;
   }
@@ -164,6 +167,7 @@ const handlePrint = async () => {
     if (contentType && contentType.includes("application/json")) {
       const text = await response.data.text();
       const json = JSON.parse(text);
+      message.destroy();
       message.warning(json.message || "Terjadi kesalahan.");
       return;
     }
@@ -173,8 +177,8 @@ const handlePrint = async () => {
     window.open(url, "_blank");
 
   } catch (e) {
-    message.error("Print PDF data barang gagal dicetak!");
-    console.error(e);
+    message.destroy();
+    message.error("Print PDF data barang gagal dicetak!");    
   } finally {
     loading.value = false;
   }

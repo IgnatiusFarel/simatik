@@ -162,11 +162,13 @@ function getBase64(file) {
 async function beforeUpload(file) {
   const isAllowedType = ['image/jpeg', 'image/jpg', 'image/png'].includes(file.type);
   if (!isAllowedType) {
+    message.destroy();
     message.error("Format file harus JPG, JPEG dan PNG!");
     return Upload.LIST_IGNORE; 
   }
   const isLt5M = file.size / 1024 / 1024 < 5; 
   if (!isLt5M) {
+    message.destroy();
     message.error("Ukuran file harus di bawah 5MB!");
     return Upload.LIST_IGNORE; 
   }
@@ -255,11 +257,12 @@ const handleSave = async () => {
       headers: { 'Content-Type': 'multipart/form-data' }
     });
 
+    message.destroy();
     message.success('Data barang berhasil diperbarui!');
     isOpen.value = false;
     emit('saved');
   } catch (error) {
-    console.error(error);
+    message.destroy();
     message.error("Data barang gagal diperbarui!");
   } finally {
     loading.value = false;
