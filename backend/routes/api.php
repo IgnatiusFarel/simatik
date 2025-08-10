@@ -1,14 +1,16 @@
 <?php
 
+use Illuminate\Support\Facades\Route;
+use App\Http\Controllers\AuthController;
 use App\Http\Controllers\DashboardController;
 use App\Http\Controllers\MasterUserController;
 use App\Http\Controllers\MasterBarangController;
-use App\Http\Controllers\AuthController;
 use App\Http\Controllers\ReportBarangController;
-use Illuminate\Support\Facades\Route;
 
+// 📁 Login & Forgot Password
 Route::post('/login', [AuthController::class, 'login']); 
-Route::post('/forgot-password', [AuthController::class, 'forgotPassword']);
+Route::post('/send-otp', [AuthController::class, 'sendOtp']);       
+Route::post('/verify-otp', [AuthController::class, 'verifyOtp']);   
 Route::post('/reset-password', [AuthController::class, 'resetPassword']);
 
 Route::middleware('auth:sanctum')->group(function () {
