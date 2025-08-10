@@ -12,7 +12,6 @@ use Illuminate\Support\Facades\Validator;
 
 class MasterBarangController extends Controller
 {
-
     public function index(Request $request)
     {
         try {
@@ -70,7 +69,8 @@ class MasterBarangController extends Controller
             Log::error('Error fetching master barang detail data: ' . $th->getMessage());
             return response()->json([
                 'status' => false,
-                'message' => 'Data barang gagal diambil!'
+                'message' => 'Data barang gagal diambil!',
+                'error' => $th->getMessage()
             ], 500);
         }
     }
@@ -125,7 +125,6 @@ class MasterBarangController extends Controller
         } catch (\Throwable $th) {
             DB::rollBack();
             Log::error('Error creating master barang data: ' . $th->getMessage());
-
             return response()->json([
                 'status' => false,
                 'message' => 'Data barang gagal dibuat!',
@@ -239,7 +238,8 @@ class MasterBarangController extends Controller
             Log::error('Error deleting master barang data: ' . $th->getMessage());
             return response()->json([
                 'status' => false,
-                'message' => 'Data barang gagal dihapus!'
+                'message' => 'Data barang gagal dihapus!',
+                'error' => $th->getMessage()
             ], 500);
         }
     }
