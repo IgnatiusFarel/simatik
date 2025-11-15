@@ -91,7 +91,7 @@
 import { ref, computed } from "vue";
 import { Menu, Bell, ChevronRight, Search, LogOut } from "lucide-vue-next";
 import { useRouter } from "vue-router";
-import { useAuthStore } from "@/stores/auth";
+import { useAuthStore } from "@/stores/Auth.js";
 import { message } from "ant-design-vue";
 
 const auth = useAuthStore();

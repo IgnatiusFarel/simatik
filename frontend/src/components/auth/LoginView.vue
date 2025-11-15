@@ -78,7 +78,7 @@
 </template>
 
 <script setup>
-import { useAuthStore } from "@/stores/auth";
+import { useAuthStore } from "@/stores/Auth.js";
 import { ref, reactive, toRaw } from "vue";
 import { message } from "ant-design-vue";
 import router from "@/router";
