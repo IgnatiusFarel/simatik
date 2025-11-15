@@ -1,5 +1,5 @@
 import { createRouter, createWebHistory } from "vue-router";
-import { useAuthStore } from "@/stores/auth.js";
+import { useAuthStore } from "@/stores/Auth.js";
 import LoginPage from "@/pages/auth/LoginPage.vue";
 import ForgotPasswordPage from "@/pages/auth/ForgotPasswordPage.vue";
 import DashboardPage from "@/pages/dashboard/DashboardPage.vue";
