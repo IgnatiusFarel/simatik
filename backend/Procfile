@@ -1,1 +1,1 @@
-web: frankenphp run --host 0.0.0.0 --port $PORT --worker public/index.php
+web: frankenphp run public/index.php
