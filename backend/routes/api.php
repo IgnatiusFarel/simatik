@@ -9,6 +9,9 @@ use App\Http\Controllers\MasterBarangController;
 use App\Http\Controllers\ReportBarangController;
 
 Route::get('/storage/{path}', function ($path) {
+    
+    $path = trim($path, '/'); 
+    
     if (Storage::disk('public')->exists($path)) {
         return response()->file(Storage::disk('public')->path($path));
     }
