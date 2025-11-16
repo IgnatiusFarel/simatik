@@ -1,48 +1,57 @@
 <?php
 
 use Illuminate\Support\Facades\Route;
+use Illuminate\Support\Facades\Storage;
 use App\Http\Controllers\AuthController;
 use App\Http\Controllers\DashboardController;
 use App\Http\Controllers\MasterUserController;
 use App\Http\Controllers\MasterBarangController;
 use App\Http\Controllers\ReportBarangController;
 
+Route::get('/storage/{path}', function ($path) {
+    if (Storage::disk('public')->exists($path)) {
+        return response()->file(Storage::disk('public')->path($path));
+    }
+
+    abort(404);
+})->where('path', '.*');
+
 // 📁 Login & Forgot Password
-Route::post('/login', [AuthController::class, 'login']); 
-Route::post('/send-otp', [AuthController::class, 'sendOtp']);       
-Route::post('/verify-otp', [AuthController::class, 'verifyOtp']);   
+Route::post('/login', [AuthController::class, 'login']);
+Route::post('/send-otp', [AuthController::class, 'sendOtp']);
+Route::post('/verify-otp', [AuthController::class, 'verifyOtp']);
 Route::post('/reset-password', [AuthController::class, 'resetPassword']);
 
 Route::middleware('auth:sanctum')->group(function () {
     Route::post('/logout', [AuthController::class, 'logout']);
 
     // 📁 Dashboard 
-    Route::prefix('dashboard')->controller(DashboardController::class)->group(function() {
+    Route::prefix('dashboard')->controller(DashboardController::class)->group(function () {
         Route::get('/', 'index');
         Route::get('/asset', 'getAssetSummary');
     });
-    
+
     // 📁 Master User 
-    Route::prefix('master-user')->controller(MasterUserController::class)->group(function() {
+    Route::prefix('master-user')->controller(MasterUserController::class)->group(function () {
         Route::get('/', 'index');
         Route::post('/', 'store');
         Route::get('/{id}', 'show');
-        Route::match(['put', 'post'], '/{id}', 'update'); 
+        Route::match(['put', 'post'], '/{id}', 'update');
         Route::delete('/{id}', 'destroy');
     });
 
     // 📁 Master Barang
-    Route::prefix('master-barang')->controller(MasterBarangController::class)->group(function() {
+    Route::prefix('master-barang')->controller(MasterBarangController::class)->group(function () {
         Route::get('/', 'index');
         Route::post('/', 'store');
         Route::get('/{id}', 'show');
-        Route::match(['put', 'post'], '/{id}', 'update'); 
+        Route::match(['put', 'post'], '/{id}', 'update');
         Route::delete('/{id}', 'destroy');
     });
 
     // 📁 Report Barang
-    Route::prefix('report-barang')->controller(ReportBarangController::class)->group(function() {
+    Route::prefix('report-barang')->controller(ReportBarangController::class)->group(function () {
         Route::get('/', 'index');
         Route::get('/print', 'print');
-    });    
+    });
 });
