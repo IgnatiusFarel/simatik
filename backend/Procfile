@@ -1,1 +1,1 @@
-web: frankenphp run --config=frankenphp.php
+web: frankenphp run --config=frankenphp.json
