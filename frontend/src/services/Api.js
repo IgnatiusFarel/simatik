@@ -1,13 +1,16 @@
 import axios from "axios";
 import router from "@/router";
 
+const baseURL = import.meta.env.VITE_API_BASE_URL || "https://simatik-production.up.railway.app/api";
+
 const api = axios.create({
-  baseURL: import.meta.env.VITE_API_BASE_URL || "https://simatik-production.up.railway.app/api",
+  baseURL: baseURL,
   headers: {
     Accept: "application/json",       
   },
   timeout: 60000,
 });
+console.log("API Base URL yang digunakan:", baseURL);
 
 api.interceptors.request.use((config) => {  
   const token = localStorage.getItem("auth_token");
