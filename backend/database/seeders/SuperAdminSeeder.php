@@ -2,9 +2,9 @@
 
 namespace Database\Seeders;
 
+use Illuminate\Support\Str;
 use Illuminate\Database\Seeder;
 use Illuminate\Support\Facades\Hash;
-use Illuminate\Support\Str;
 use App\Models\User;
 use App\Models\MasterUser;
 
@@ -18,7 +18,7 @@ class SuperAdminSeeder extends Seeder
             [
                 'user_id'  => (string) Str::uuid(),
                 'email'    => 'superadmin@gmail.com',
-                'password' => '12345678',
+                'password' => Hash::make('12345678'),
                 'role'     => 'superadmin',
             ]
         );
