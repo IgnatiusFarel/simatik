@@ -1,8 +1,0 @@
-{
-  "workers": [
-    {
-      "type": "php",
-      "script": "public/index.php"
-    }
-  ]
-}
