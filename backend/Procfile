@@ -1,1 +1,1 @@
-web: frankenphp run public/index.php
+web: frankenphp run --worker public/index.php
