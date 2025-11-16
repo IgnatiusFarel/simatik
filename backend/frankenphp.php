@@ -4,16 +4,17 @@ use Illuminate\Http\Request;
 
 define('LARAVEL_START', microtime(true));
 
-// Maintenance mode
+// maintenance mode
 if (file_exists($maintenance = __DIR__.'/storage/framework/maintenance.php')) {
     require $maintenance;
 }
 
-// Composer autoload
+// composer autoload
 require __DIR__.'/vendor/autoload.php';
 
-// Bootstrap Laravel
+// bootstrap Laravel
 $app = require_once __DIR__.'/bootstrap/app.php';
 
-// Handle request via FrankenPHP
+// handle request
 $app->handleRequest(Request::capture());
+
