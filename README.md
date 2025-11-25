@@ -1,6 +1,6 @@
 # **SIMATIK - Sistem Informasi Manajemen Aset TIK** 📦
 
-> **Full-Stack Practice Project** </> 🤖 – Backend menggunakan **Laravel 12** & Frontend menggunakan **Vue 3**, dengan desain UI diambil dari [Figma Community](https://www.figma.com/community/file/1426385374644644649/sistem-informasi-manajemen-aset-tik) 🤝
+> **Full-Stack Practice Project** </> 🤖 – Backend menggunakan **Laravel 12** & Frontend menggunakan **Vue 3**, dengan inspirasi desain UI diambil dari [Figma Community](https://www.figma.com/community/file/1426385374644644649/sistem-informasi-manajemen-aset-tik) 🤝
 
 ---
 
@@ -33,8 +33,8 @@ Beberapa fitur utama:
 1. **Clone repository backend**
 
    ```bash
-   git clone https://github.com/username/simatik-backend.git
-   cd simatik-backend
+   git clone https://github.com/IgnatiusFarel/simatik.git
+   cd backend
    ```
 
 2. **Install dependencies**
@@ -87,8 +87,8 @@ Beberapa fitur utama:
 1. **Clone repository frontend**
 
    ```bash
-   git clone https://github.com/username/simatik-frontend.git
-   cd simatik-frontend
+   git clone https://github.com/IgnatiusFarel/simatik.git
+   cd frontend
    ```
 
 2. **Install dependencies**
@@ -194,6 +194,6 @@ simatik/
 ## **8. Lisensi**
 
 Proyek ini dibuat untuk keperluan pembelajaran.
-UI diambil dari [Figma Community](https://www.figma.com/community/file/1426385374644644649/sistem-informasi-manajemen-aset-tik).
+Inspirasi UI diambil dari [Figma Community](https://www.figma.com/community/file/1426385374644644649/sistem-informasi-manajemen-aset-tik).
 
 ---
