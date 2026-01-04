@@ -9,15 +9,12 @@
 <script setup>
 import { computed } from 'vue'
 import { useRoute } from 'vue-router'
-import DashboardLayout from './components/layout/DashboardLayout.vue'
-import EmptyLayout from './components/layout/EmptyLayout.vue'
-import theme from './config/theme'
+import DashboardLayout from '@/components/layout/DashboardLayout.vue'
+import EmptyLayout from '@/components/layout/EmptyLayout.vue'
+import theme from '@/config/theme'
 
 const route = useRoute()
 
-// const layoutComponent = computed(() => {
-//   return route.meta.layout === 'empty' ? EmptyLayout : DashboardLayout
-// })
 const layoutComponent = computed(() => {
   if (route.meta.layout === 'dashboard') {
     return DashboardLayout
