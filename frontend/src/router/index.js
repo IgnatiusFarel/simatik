@@ -6,7 +6,7 @@ import DashboardPage from "@/pages/dashboard/DashboardPage.vue";
 import MasterBarangPage from "@/pages/master-data/MasterBarangPage.vue";
 import MasterUserPage from "@/pages/master-data/MasterUserPage.vue";
 import ReportBarangPage from "@/pages/report-barang/ReportBarang.vue";
-import NotFoundPage from "../pages/NotFoundPage.vue";
+import NotFoundPage from "@/pages/NotFoundPage.vue";
 
 function normalizeRole(role) {
   return (role || "").toLowerCase().replace(/\s+/g, "");
