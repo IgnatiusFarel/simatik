@@ -82,8 +82,8 @@ const columns = [
           width: 80,
           height: 80,
           style: { borderRadius: "4px", objectFit: "cover" },
-          fallback:
-            "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAMIAAADDCAYAAADQvc6UAAAB...",
+          class: "rounded shadow-sm object-cover border",        
+          fallback: "https://placehold.co/60x60?text=404",
           preview: { src: imgSrc },
         }),
         h("span", record.barang),
