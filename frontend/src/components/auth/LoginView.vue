@@ -11,7 +11,7 @@
     <div class="w-full lg:w-1/2 flex items-center justify-center">
       <div class="w-full max-w-[480px] px-4 space-y-4">
         <div class="flex justify-center">
-          <img src="@/assets/Logo.png" alt="logo" class="w-48" />
+          <img src="@/assets/Logo.png" alt="logo" class="w-48" />          
         </div>
 
         <a-form
@@ -81,7 +81,7 @@
 import { useAuthStore } from "@/stores/Auth.js";
 import { ref, reactive, toRaw, onMounted, h } from "vue";
 import { message, notification } from "ant-design-vue";
-import router from "@/router";
+import router from "@/router/index.js";
 
 const auth = useAuthStore();
 const loading = ref(false);

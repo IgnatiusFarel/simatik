@@ -165,7 +165,7 @@
 <script setup>
 import { ref, reactive } from "vue";
 import { message } from "ant-design-vue";
-import router from "@/router";
+import router from "@/router/index.js";
 import Api from "@/services/Api.js";
 
 const current = ref(0);
