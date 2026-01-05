@@ -27,7 +27,7 @@
 
 <script setup>
 import { h, onMounted, ref } from "vue";
-import { Tag, Image } from "ant-design-vue";
+import { Tag, Image, message } from "ant-design-vue";
 import AssetCard from "./AssetCard.vue";
 import CustomTable from "../CustomTable.vue";
 import Api from "@/services/Api.js";
