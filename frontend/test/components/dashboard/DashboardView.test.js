@@ -60,15 +60,23 @@ const mockAssetResponse = {
 };
 
 describe("DashboardView.vue", () => {
-  let wrapper;
-
   const createWrapper = () => {
     return mount(DashboardView, {
       global: {
         plugins: [Antd],
         stubs: {
           AssetCard: true,
-          CustomTable: true,
+          CustomTable: {
+            name: "CustomTable",
+            template: `
+    <div class="custom-table">
+      <div class="header-action">
+        <slot name="header-action" />
+      </div>
+      <slot />
+    </div>
+  `,
+          },
         },
       },
     });
@@ -90,24 +98,22 @@ describe("DashboardView.vue", () => {
 
       const cards = wrapper.findAllComponents({ name: "AssetCard" });
       expect(cards).toHaveLength(3);
+      beforeEach(() => {
+        mockApiGet
+          .mockResolvedValueOnce(mockDashboardResponse)
+          .mockResolvedValueOnce(mockAssetResponse);
+      });
     });
 
     it("renders CustomTable component", () => {
-      wrapper = createWrapper();
-
-      expect(wrapper.findComponent({ name: "CustomTable" }).exists()).toBe(
-        true
-      );
+      expect(wrapper.find(".custom-table").exists()).toBe(true);
     });
 
-   it('renders Recent History header slot', () => {
-  wrapper = createWrapper()
-
-  const header = wrapper.find('.table-header')
-  expect(header.exists()).toBe(true)
-  expect(header.text()).toContain('⏱ Recent History')
-});
-
+    it("renders Recent History header slot", () => {
+      const header = wrapper.find(".header-action");
+      expect(header.exists()).toBe(true);
+      expect(header.text()).toContain("⏱ Recent History");
+    });
   });
 
   describe("Initial State", () => {
@@ -256,3 +262,4 @@ describe("DashboardView.vue", () => {
     });
   });
 });
+22;

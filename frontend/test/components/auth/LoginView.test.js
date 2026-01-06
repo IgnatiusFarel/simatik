@@ -2,7 +2,6 @@ import { mount, flushPromises } from "@vue/test-utils";
 import { describe, it, expect, vi, beforeEach } from "vitest";
 import Login from "@/components/auth/LoginView.vue";
 
-// 1. Move all mock functions into a hoisted block
 const mocks = vi.hoisted(() => {
   return {
     push: vi.fn(),
@@ -13,7 +12,6 @@ const mocks = vi.hoisted(() => {
   };
 });
 
-// 2. Reference the hoisted object in your mocks
 vi.mock("@/router/index.js", () => ({
   default: {
     push: mocks.push,
@@ -50,11 +48,19 @@ describe("Login.vue", () => {
     mount(Login, {
       global: {
         stubs: {
-          "a-form": { template: `<form @submit.prevent="$emit('finish')"><slot /></form>` },
+          "a-form": {
+            template: `<form @submit.prevent="$emit('finish')"><slot /></form>`,
+          },
           "a-form-item": { template: `<div><slot /></div>` },
-          "a-input": { template: `<input @input="$emit('update:value', $event.target.value)" />` },
-          "a-input-password": { template: `<input type="password" @input="$emit('update:value', $event.target.value)" />` },
-          "a-checkbox": { template: `<input type="checkbox" @change="$emit('update:checked', $event.target.checked)" />` },
+          "a-input": {
+            template: `<input @input="$emit('update:value', $event.target.value)" />`,
+          },
+          "a-input-password": {
+            template: `<input type="password" @input="$emit('update:value', $event.target.value)" />`,
+          },
+          "a-checkbox": {
+            template: `<input type="checkbox" @change="$emit('update:checked', $event.target.checked)" />`,
+          },
           "a-button": { template: `<button type="submit"><slot /></button>` },
         },
       },
