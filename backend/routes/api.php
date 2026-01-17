@@ -8,6 +8,8 @@ use App\Http\Controllers\MasterUserController;
 use App\Http\Controllers\MasterBarangController;
 use App\Http\Controllers\ReportBarangController;
 
+Route::get('/server-health', fn () => 'API OK');
+
 Route::get('/storage/{path}', function ($path) {
     
     $path = trim($path, '/'); 
@@ -46,7 +48,7 @@ Route::middleware('auth:sanctum')->group(function () {
     // 📁 Master Barang
     Route::prefix('master-barang')->controller(MasterBarangController::class)->group(function () {
         Route::get('/', 'index');
-        Route::post('/', 'store');
+        Route::post('/', 'store')->name('master-barang.store');
         Route::get('/{id}', 'show');
         Route::match(['put', 'post'], '/{id}', 'update');
         Route::delete('/{id}', 'destroy');
@@ -58,3 +60,4 @@ Route::middleware('auth:sanctum')->group(function () {
         Route::get('/print', 'print');
     });
 });
+
